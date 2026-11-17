@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Retos</title>
+<meta name="theme-color" content="#1b1033">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Retos">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<style>
+  :root{
+    --bg1:#1b1033; --bg2:#3a1c71; --card:#ffffff14; --line:#ffffff26;
+    --txt:#fff; --mut:#c9bde6; --pink:#ff4fa3; --yel:#ffd54a; --cyan:#3ee0ff; --green:#41e08a;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;background:var(--bg1);color:var(--txt);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-user-select:none;user-select:none}
+  body{background:radial-gradient(120% 80% at 50% 0%,var(--bg2),var(--bg1) 70%) fixed}
+  #app{min-height:100dvh;display:flex;flex-direction:column;
+    padding:max(18px,env(safe-area-inset-top)) 18px max(18px,env(safe-area-inset-bottom))}
+  section{flex:1;display:flex;flex-direction:column;gap:16px;max-width:520px;width:100%;margin:0 auto}
+  section[hidden]{display:none}
+  h1{margin:8px 0 0;font-size:34px;text-align:center;letter-spacing:-.5px}
+  h1 span{color:var(--yel)}
+  .sub{text-align:center;color:var(--mut);margin:0}
+  h3{margin:6px 0 0;font-size:13px;text-transform:uppercase;letter-spacing:1.5px;color:var(--mut)}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px}
+  .row{display:flex;gap:10px}
+  input,textarea,select{width:100%;font:inherit;color:var(--txt);background:#00000040;border:1px solid var(--line);
+    border-radius:12px;padding:13px 14px;outline:none;-webkit-user-select:text;user-select:text}
+  input:focus,textarea:focus{border-color:var(--cyan)}
+  select option{color:#000}
+  button{font:inherit;color:var(--txt);border:0;border-radius:14px;padding:14px 16px;font-weight:700;cursor:pointer;
+    background:#ffffff1f;transition:transform .08s,opacity .2s}
+  button:active{transform:scale(.96)}
+  button:disabled{opacity:.4}
+  .primary{background:linear-gradient(135deg,var(--pink),#ff7a45);font-size:18px;padding:16px}
+  .ghost{background:transparent;border:1px solid var(--line);color:var(--mut)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{display:inline-flex;align-items:center;gap:8px;background:#ffffff1f;border-radius:999px;padding:8px 8px 8px 14px;font-weight:600}
+  .chip b{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#ffffff2a;font-size:13px;cursor:pointer}
+  .lvl{flex:1;text-align:center;padding:12px 6px;border:2px solid transparent}
+  .lvl small{display:block;font-weight:500;color:var(--mut);font-size:11px;margin-top:2px}
+  .lvl.on{border-color:var(--cyan);background:#3ee0ff22}
+  .hint{font-size:13px;color:var(--mut);text-align:center;margin:0}
+  /* turno */
+  .top{display:flex;justify-content:space-between;align-items:center;color:var(--mut);font-size:14px}
+  .top button{padding:8px 12px;font-size:14px}
+  .turnname{font-size:clamp(40px,13vw,64px);font-weight:900;text-align:center;line-height:1.05;margin:0;word-break:break-word;
+    background:linear-gradient(135deg,var(--yel),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .center{flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px}
+  .big{font-size:24px;padding:22px}
+  .truth{background:linear-gradient(135deg,#2f7bff,var(--cyan));color:#06203a}
+  .dare{background:linear-gradient(135deg,var(--pink),#ff7a45)}
+  .rand{background:linear-gradient(135deg,#8a5cff,#c35cff)}
+  /* tarjeta */
+  .cardwrap{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px}
+  .card{border-radius:26px;padding:28px 22px;text-align:center;min-height:280px;display:flex;flex-direction:column;
+    justify-content:center;gap:14px;box-shadow:0 20px 50px #0008;animation:pop .35s cubic-bezier(.2,1.4,.4,1)}
+  .card.truth{color:#06203a}
+  .card .tag{font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;opacity:.85}
+  .card .txt{font-size:clamp(22px,6.2vw,30px);font-weight:800;line-height:1.25}
+  .card.shuffle .txt{opacity:.5;filter:blur(2px)}
+  .who{text-align:center;color:var(--mut);margin:0}
+  .ok{background:linear-gradient(135deg,#20c765,var(--green));color:#032a14;font-size:18px;padding:16px}
+  .skip{background:#ffffff1f}
+  @keyframes pop{from{transform:scale(.85) rotate(-2deg);opacity:0}to{transform:none;opacity:1}}
+  /* marcador */
+  .sc{display:flex;align-items:center;gap:12px;padding:14px;border-radius:16px;background:var(--card);border:1px solid var(--line)}
+  .sc .pos{width:30px;text-align:center;font-size:20px}
+  .sc .nm{flex:1;font-weight:700;font-size:18px;word-break:break-word}
+  .sc .pt{font-weight:900;font-size:24px;color:var(--yel)}
+  .sc.cur{border-color:var(--cyan)}
+  .custom-item{display:flex;gap:10px;align-items:center;font-size:14px;padding:8px 0;border-bottom:1px solid var(--line)}
+  .custom-item span{flex:1}
+  .custom-item em{font-style:normal;font-size:11px;color:var(--mut);text-transform:uppercase}
+  .custom-item b{cursor:pointer;color:var(--mut);padding:4px 8px}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- CONFIGURACIÓN -->
+  <section id="setup">
+    <h1>🎲 <span>Retos</span></h1>
+    <p class="sub">Pásense el celular y cumplan.</p>
+
+    <h3>Jugadores</h3>
+    <div class="box">
+      <div class="row">
+        <input id="pname" placeholder="Nombre del jugador" maxlength="14" autocomplete="off">
+        <button id="addP" style="white-space:nowrap">+ Añadir</button>
+      </div>
+      <div class="chips" id="chips" style="margin-top:12px"></div>
+    </div>
+
+    <h3>Nivel de los retos</h3>
+    <div class="row" id="levels">
+      <button class="lvl" data-l="suave">😇 Suave<small>para todos</small></button>
+      <button class="lvl" data-l="divertido">🤪 Divertido<small>pasarla bien</small></button>
+      <button class="lvl" data-l="atrevido">😈 Atrevido<small>solo amigos</small></button>
+    </div>
+
+    <h3>Tus propios retos</h3>
+    <div class="box">
+      <textarea id="ctext" rows="2" placeholder="Escribe un reto o una verdad inventada por ustedes"></textarea>
+      <div class="row" style="margin-top:10px">
+        <select id="ctype" style="flex:1"><option value="reto">Reto</option><option value="verdad">Verdad</option></select>
+        <button id="addC">Guardar</button>
+      </div>
+      <div id="clist" style="margin-top:8px"></div>
+    </div>
+
+    <div style="flex:1"></div>
+    <button class="primary" id="start">¡Empezar!</button>
+    <button class="ghost" id="resume" hidden>Continuar partida</button>
+    <p class="hint">Todo se guarda en tu celular. Funciona sin internet.</p>
+  </section>
+
+  <!-- TURNO -->
+  <section id="turn" hidden>
+    <div class="top">
+      <span id="round"></span>
+      <button id="toScores">🏆 Puntos</button>
+    </div>
+    <div class="center">
+      <p class="sub">Le toca a</p>
+      <h2 class="turnname" id="who"></h2>
+      <p class="sub" style="margin-bottom:8px">¿Qué eliges?</p>
+      <button class="big truth" data-t="verdad">🗣️ Verdad</button>
+      <button class="big dare" data-t="reto">🔥 Reto</button>
+      <button class="big rand" data-t="azar">🎰 Sorpréndeme</button>
+    </div>
+  </section>
+
+  <!-- TARJETA -->
+  <section id="cardsec" hidden>
+    <div class="cardwrap">
+      <p class="who" id="cwho"></p>
+      <div class="card" id="card"><div class="tag" id="ctag"></div><div class="txt" id="ctxt"></div></div>
+      <button class="ok" id="done">✅ Cumplido (+1)</button>
+      <button class="skip" id="pass">⏭️ Paso (−1)</button>
+    </div>
+  </section>
+
+  <!-- PUNTOS -->
+  <section id="scores" hidden>
+    <h1>🏆 <span>Puntos</span></h1>
+    <div id="slist" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div style="flex:1"></div>
+    <button class="primary" id="back">Seguir jugando</button>
+    <button class="ghost" id="reset">Terminar y volver al inicio</button>
+  </section>
+
+</div>
+
+<script>
+/* ===================== BANCO DE RETOS ===================== */
+const DB = {
+  suave: {
+    verdad: [
+      "¿Cuál ha sido tu momento más vergonzoso en público?",
+      "¿Cuál es la mentira más grande que le has dicho a tu mamá?",
+      "¿Qué es lo más raro que has buscado en Google?",
+      "¿Cuál es tu miedo más irracional?",
+      "¿Qué canción te da pena admitir que te encanta?",
+      "¿Cuál es el peor regalo que has recibido?",
+      "¿Qué hábito tuyo crees que molesta a los demás?",
+      "¿Cuál fue tu peor salida o cita?",
+      "¿Qué es lo más loco que has hecho por dinero?",
+      "¿Qué película o serie te hizo llorar y nunca lo admitiste?",
+      "¿Cuál es el apodo más ridículo que te han puesto?",
+      "¿Qué haces cuando estás solo/a que nadie sabe?",
+      "¿Cuál ha sido tu peor corte de pelo?",
+      "¿Qué talento inútil tienes?"
+    ],
+    reto: [
+      "Habla con acento extranjero durante las próximas 3 rondas.",
+      "Haz tu mejor imitación de otra persona del grupo.",
+      "Cuenta un chiste. Si nadie se ríe, cuentas otro.",
+      "Baila 20 segundos sin música.",
+      "Di el abecedario al revés lo más rápido que puedas.",
+      "Haz 10 sentadillas.",
+      "Imita a un animal hasta que alguien adivine cuál es.",
+      "Canta el coro de la última canción que escuchaste.",
+      "Habla en rima hasta tu próximo turno.",
+      "Hazle un cumplido sincero a cada jugador.",
+      "Mantén el equilibrio en un pie durante 30 segundos.",
+      "Cuenta del 1 al 20 sin reírte mientras todos te hacen caras.",
+      "Haz tu mejor cara de susto y mantenla 10 segundos.",
+      "Camina como modelo por toda la sala."
+    ]
+  },
+  divertido: {
+    verdad: [
+      "¿Cuál es el chisme más grande que sabes y no has contado?",
+      "¿Quién de aquí crees que se casa primero?",
+      "¿Quién del grupo es el más tacaño?",
+      "¿Cuál es tu secreto más tonto?",
+      "Si pudieras cambiar de vida con alguien del grupo por un día, ¿con quién y por qué?",
+      "¿Quién del grupo tarda más en responder un mensaje?",
+      "¿Cuál es la peor excusa que has usado para no salir?",
+      "¿Qué es lo más caro que has roto?",
+      "¿Quién del grupo sobreviviría más en un apocalipsis zombie?",
+      "¿Qué opinión impopular tienes que nadie aquí comparte?",
+      "¿Quién del grupo es el más dramático?",
+      "¿Cuál es la cosa más infantil que todavía haces?",
+      "¿A quién de aquí le prestarías dinero sin pensarlo?",
+      "¿Cuál es la peor mentira que has dicho para zafarte de algo?"
+    ],
+    reto: [
+      "Enseña la última foto de tu galería, sin editarla.",
+      "Haz una declaración de amor dramática a un objeto de la habitación.",
+      "Cuenta lo que hiciste hoy como si fueras narrador de telenovela.",
+      "Habla como locutor de radio hasta tu próximo turno.",
+      "Imita el baile de otro jugador hasta que adivinen quién es.",
+      "Pon cara de enamorado/a mirando a otro jugador durante 15 segundos.",
+      "Manda un audio a un amigo diciendo solo «te extraño» y sin explicar nada.",
+      "Deja que el grupo te ponga una pose y te tome una foto.",
+      "Haz un anuncio de TV para venderle a alguien el celular que tienes en la mano.",
+      "Intenta lamerte el codo. Todos te miran.",
+      "Haz un mini discurso de 20 segundos como si ganaras un Óscar.",
+      "Escribe con la nariz tu nombre en el aire, letra por letra.",
+      "Cuenta un chisme inventado y trata de que todos se lo crean.",
+      "Habla sin mover los labios durante 30 segundos."
+    ]
+  },
+  atrevido: {
+    verdad: [
+      "¿Quién de aquí te parece más atractivo/a?",
+      "¿Cómo fue tu primer beso?",
+      "¿Alguna vez te enamoraste de alguien que no debías?",
+      "¿Has stalkeado a tu ex recientemente?",
+      "¿Qué es lo más atrevido que has hecho por alguien que te gustaba?",
+      "¿Cuál es tu mayor red flag?",
+      "¿Con quién del grupo saldrías a una cita a ciegas?",
+      "¿Cuál es el mensaje más vergonzoso que le has mandado a la persona equivocada?",
+      "¿Qué te enamora de una persona a primera vista?",
+      "¿Has fingido que alguien te gustaba para no herirlo/a?",
+      "¿Cuál es la peor cita que has tenido?",
+      "¿Qué es lo más raro que has hecho para llamar la atención de alguien?"
+    ],
+    reto: [
+      "Enséñale al grupo tus últimas 5 búsquedas en Instagram.",
+      "Di en voz alta lo que más te gusta de cada jugador.",
+      "Pon tu mejor mirada seductora a la cámara frontal y enséñasela al grupo.",
+      "Dile a alguien del grupo algo que nunca le has dicho.",
+      "Deja que otro jugador lea tu último chat con tu mejor amigo/a (solo en voz alta lo que tú aceptes).",
+      "Manda un «te estaba pensando» a la última persona con quien chateaste, con el grupo mirando.",
+      "Cuéntale al grupo cómo coqueteas, con un jugador como «víctima».",
+      "Deja que el grupo escoja a quién le mandas un emoji 😘 por mensaje.",
+      "Describe a tu pareja ideal en 15 segundos sin pensarlo.",
+      "Haz tu mejor pose de portada de revista y que alguien te fotografíe.",
+      "Di con quién del grupo te irías de viaje y por qué.",
+      "Recita un piropo cursi improvisado a quien tú elijas."
+    ]
+  }
+};
+
+/* ===================== ESTADO ===================== */
+const KEY = "retos-app-v1";
+const def = () => ({players:[], levels:["suave","divertido"], idx:0, turns:0, custom:[], used:{}, started:false});
+let S;
+try { S = Object.assign(def(), JSON.parse(localStorage.getItem(KEY) || "{}")); } catch(e){ S = def(); }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} };
+const $ = s => document.querySelector(s);
+const show = id => document.querySelectorAll("section").forEach(s => s.hidden = s.id !== id);
+const buzz = n => { try { navigator.vibrate && navigator.vibrate(n); } catch(e){} };
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ===================== CONFIGURACIÓN ===================== */
+function renderSetup(){
+  $("#chips").innerHTML = S.players.map((p,i) =>
+    `<span class="chip">${esc(p.name)}<b data-i="${i}">✕</b></span>`).join("")
+    || `<span class="hint">Añade al menos 2 jugadores</span>`;
+  document.querySelectorAll(".lvl").forEach(b => b.classList.toggle("on", S.levels.includes(b.dataset.l)));
+  $("#clist").innerHTML = S.custom.map((c,i) =>
+    `<div class="custom-item"><em>${c.type}</em><span>${esc(c.text)}</span><b data-i="${i}">✕</b></div>`).join("");
+  $("#start").disabled = S.players.length < 2 || !S.levels.length;
+  $("#resume").hidden = !(S.started && S.players.length >= 2);
+}
+function addPlayer(){
+  const v = $("#pname").value.trim();
+  if(!v) return;
+  if(S.players.some(p => p.name.toLowerCase() === v.toLowerCase())){ $("#pname").value=""; return; }
+  S.players.push({name:v, score:0});
+  $("#pname").value = ""; save(); renderSetup(); $("#pname").focus();
+}
+$("#addP").onclick = addPlayer;
+$("#pname").addEventListener("keydown", e => { if(e.key === "Enter") addPlayer(); });
+$("#chips").onclick = e => {
+  const i = e.target.dataset.i; if(i === undefined) return;
+  S.players.splice(+i,1); S.started = false; save(); renderSetup();
+};
+$("#levels").onclick = e => {
+  const b = e.target.closest(".lvl"); if(!b) return;
+  const l = b.dataset.l;
+  S.levels = S.levels.includes(l) ? S.levels.filter(x => x !== l) : [...S.levels, l];
+  save(); renderSetup();
+};
+$("#addC").onclick = () => {
+  const t = $("#ctext").value.trim(); if(!t) return;
+  S.custom.push({text:t, type:$("#ctype").value});
+  $("#ctext").value = ""; save(); renderSetup();
+};
+$("#clist").onclick = e => {
+  const i = e.target.dataset.i; if(i === undefined) return;
+  S.custom.splice(+i,1); save(); renderSetup();
+};
+$("#start").onclick = () => {
+  S.players.forEach(p => p.score = 0);
+  S.idx = 0; S.turns = 0; S.used = {}; S.started = true; save(); goTurn();
+};
+$("#resume").onclick = goTurn;
+
+/* ===================== TURNOS ===================== */
+function goTurn(){
+  const n = S.players.length;
+  $("#who").textContent = S.players[S.idx].name;
+  $("#round").textContent = "Ronda " + (Math.floor(S.turns / n) + 1);
+  show("turn");
+}
+function pick(type){
+  let all = [];
+  S.levels.forEach(l => DB[l][type].forEach(t => all.push(t)));
+  S.custom.filter(c => c.type === type).forEach(c => all.push(c.text));
+  let fresh = all.filter(t => !S.used[type + "|" + t]);
+  if(!fresh.length){
+    Object.keys(S.used).filter(k => k.startsWith(type + "|")).forEach(k => delete S.used[k]);
+    fresh = all;
+  }
+  const t = fresh[Math.floor(Math.random() * fresh.length)];
+  S.used[type + "|" + t] = 1; save();
+  return t;
+}
+let busy = false;
+function draw(type){
+  if(busy) return; busy = true;
+  const real = type === "azar" ? (Math.random() < .5 ? "verdad" : "reto") : type;
+  const text = pick(real);
+  const card = $("#card");
+  $("#cwho").textContent = S.players[S.idx].name + ", es tu turno";
+  card.className = "card shuffle " + (real === "verdad" ? "truth" : "dare");
+  $("#ctag").textContent = real === "verdad" ? "🗣️ Verdad" : "🔥 Reto";
+  show("cardsec");
+  buzz(30);
+  const pool = [...DB.suave.verdad, ...DB.suave.reto, ...DB.divertido.reto];
+  let n = 0;
+  const iv = setInterval(() => {
+    $("#ctxt").textContent = pool[Math.floor(Math.random() * pool.length)];
+    if(++n > (type === "azar" ? 10 : 4)){
+      clearInterval(iv);
+      card.className = "card " + (real === "verdad" ? "truth" : "dare");
+      $("#ctxt").textContent = text;
+      buzz([20,40,20]); busy = false;
+    }
+  }, 90);
+}
+document.querySelectorAll("[data-t]").forEach(b => b.onclick = () => draw(b.dataset.t));
+function next(delta){
+  if(busy) return;
+  const p = S.players[S.idx];
+  p.score = Math.max(0, p.score + delta);
+  S.idx = (S.idx + 1) % S.players.length;
+  S.turns++; save(); buzz(15); goTurn();
+}
+$("#done").onclick = () => next(1);
+$("#pass").onclick = () => next(-1);
+
+/* ===================== PUNTOS ===================== */
+$("#toScores").onclick = () => {
+  const medals = ["🥇","🥈","🥉"];
+  const sorted = S.players.map((p,i) => ({...p, i})).sort((a,b) => b.score - a.score);
+  $("#slist").innerHTML = sorted.map((p,k) =>
+    `<div class="sc ${p.i === S.idx ? "cur" : ""}"><div class="pos">${medals[k] || (k+1)}</div>
+     <div class="nm">${esc(p.name)}</div><div class="pt">${p.score}</div></div>`).join("");
+  show("scores");
+};
+$("#back").onclick = goTurn;
+$("#reset").onclick = () => {
+  if(!confirm("¿Terminar la partida y volver al inicio?")) return;
+  S.started = false; save(); renderSetup(); show("setup");
+};
+
+/* ===================== INICIO ===================== */
+renderSetup();
+if(S.started && S.players.length >= 2){ goTurn(); } else { show("setup"); }
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+}
+</script>
+</body>
+</html>
