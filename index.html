@@ -1,399 +1,2110 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Retos</title>
-<meta name="theme-color" content="#1b1033">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Retos">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="icon" href="icon-192.png">
-<style>
-  :root{
-    --bg1:#1b1033; --bg2:#3a1c71; --card:#ffffff14; --line:#ffffff26;
-    --txt:#fff; --mut:#c9bde6; --pink:#ff4fa3; --yel:#ffd54a; --cyan:#3ee0ff; --green:#41e08a;
-  }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;height:100%;background:var(--bg1);color:var(--txt);
-    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-user-select:none;user-select:none}
-  body{background:radial-gradient(120% 80% at 50% 0%,var(--bg2),var(--bg1) 70%) fixed}
-  #app{min-height:100dvh;display:flex;flex-direction:column;
-    padding:max(18px,env(safe-area-inset-top)) 18px max(18px,env(safe-area-inset-bottom))}
-  section{flex:1;display:flex;flex-direction:column;gap:16px;max-width:520px;width:100%;margin:0 auto}
-  section[hidden]{display:none}
-  h1{margin:8px 0 0;font-size:34px;text-align:center;letter-spacing:-.5px}
-  h1 span{color:var(--yel)}
-  .sub{text-align:center;color:var(--mut);margin:0}
-  h3{margin:6px 0 0;font-size:13px;text-transform:uppercase;letter-spacing:1.5px;color:var(--mut)}
-  .box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px}
-  .row{display:flex;gap:10px}
-  input,textarea,select{width:100%;font:inherit;color:var(--txt);background:#00000040;border:1px solid var(--line);
-    border-radius:12px;padding:13px 14px;outline:none;-webkit-user-select:text;user-select:text}
-  input:focus,textarea:focus{border-color:var(--cyan)}
-  select option{color:#000}
-  button{font:inherit;color:var(--txt);border:0;border-radius:14px;padding:14px 16px;font-weight:700;cursor:pointer;
-    background:#ffffff1f;transition:transform .08s,opacity .2s}
-  button:active{transform:scale(.96)}
-  button:disabled{opacity:.4}
-  .primary{background:linear-gradient(135deg,var(--pink),#ff7a45);font-size:18px;padding:16px}
-  .ghost{background:transparent;border:1px solid var(--line);color:var(--mut)}
-  .chips{display:flex;flex-wrap:wrap;gap:8px}
-  .chip{display:inline-flex;align-items:center;gap:8px;background:#ffffff1f;border-radius:999px;padding:8px 8px 8px 14px;font-weight:600}
-  .chip b{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#ffffff2a;font-size:13px;cursor:pointer}
-  .lvl{flex:1;text-align:center;padding:12px 6px;border:2px solid transparent}
-  .lvl small{display:block;font-weight:500;color:var(--mut);font-size:11px;margin-top:2px}
-  .lvl.on{border-color:var(--cyan);background:#3ee0ff22}
-  .hint{font-size:13px;color:var(--mut);text-align:center;margin:0}
-  /* turno */
-  .top{display:flex;justify-content:space-between;align-items:center;color:var(--mut);font-size:14px}
-  .top button{padding:8px 12px;font-size:14px}
-  .turnname{font-size:clamp(40px,13vw,64px);font-weight:900;text-align:center;line-height:1.05;margin:0;word-break:break-word;
-    background:linear-gradient(135deg,var(--yel),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
-  .center{flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px}
-  .big{font-size:24px;padding:22px}
-  .truth{background:linear-gradient(135deg,#2f7bff,var(--cyan));color:#06203a}
-  .dare{background:linear-gradient(135deg,var(--pink),#ff7a45)}
-  .rand{background:linear-gradient(135deg,#8a5cff,#c35cff)}
-  /* tarjeta */
-  .cardwrap{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px}
-  .card{border-radius:26px;padding:28px 22px;text-align:center;min-height:280px;display:flex;flex-direction:column;
-    justify-content:center;gap:14px;box-shadow:0 20px 50px #0008;animation:pop .35s cubic-bezier(.2,1.4,.4,1)}
-  .card.truth{color:#06203a}
-  .card .tag{font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;opacity:.85}
-  .card .txt{font-size:clamp(22px,6.2vw,30px);font-weight:800;line-height:1.25}
-  .card.shuffle .txt{opacity:.5;filter:blur(2px)}
-  .who{text-align:center;color:var(--mut);margin:0}
-  .ok{background:linear-gradient(135deg,#20c765,var(--green));color:#032a14;font-size:18px;padding:16px}
-  .skip{background:#ffffff1f}
-  @keyframes pop{from{transform:scale(.85) rotate(-2deg);opacity:0}to{transform:none;opacity:1}}
-  /* marcador */
-  .sc{display:flex;align-items:center;gap:12px;padding:14px;border-radius:16px;background:var(--card);border:1px solid var(--line)}
-  .sc .pos{width:30px;text-align:center;font-size:20px}
-  .sc .nm{flex:1;font-weight:700;font-size:18px;word-break:break-word}
-  .sc .pt{font-weight:900;font-size:24px;color:var(--yel)}
-  .sc.cur{border-color:var(--cyan)}
-  .custom-item{display:flex;gap:10px;align-items:center;font-size:14px;padding:8px 0;border-bottom:1px solid var(--line)}
-  .custom-item span{flex:1}
-  .custom-item em{font-style:normal;font-size:11px;color:var(--mut);text-transform:uppercase}
-  .custom-item b{cursor:pointer;color:var(--mut);padding:4px 8px}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Verdad o Reto — Fiesta</title>
+  <style>
+    /* ==========================================================================
+       1. VARIABLES Y RESETEO BASE (MOBILE-FIRST & MODO OSCURO)
+       ========================================================================== */
+    :root {
+      --bg-dark: #0f1117;
+      --bg-card: #1a1d27;
+      --bg-elevated: #242836;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+
+      /* Colores por sexo */
+      --female: #ff4d9d;
+      --female-glow: rgba(255, 77, 157, 0.45);
+      --female-bg: rgba(255, 77, 157, 0.14);
+
+      --male: #3b82f6;
+      --male-glow: rgba(59, 130, 246, 0.45);
+      --male-bg: rgba(59, 130, 246, 0.14);
+
+      /* Acentos de acción */
+      --truth: #10b981;
+      --dare: #f59e0b;
+      --danger: #ef4444;
+      --accent: #8b5cf6;
+
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+      --shadow-soft: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-dark);
+      background-image: radial-gradient(circle at top right, #1e1b4b 0%, transparent 45%),
+                        radial-gradient(circle at bottom left, #31102f 0%, transparent 45%);
+      color: var(--text-main);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+      line-height: 1.4;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 500px;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding: 14px 16px 24px;
+      position: relative;
+    }
+
+    /* ==========================================================================
+       2. HEADER Y NAVEGACIÓN SUPERIOR
+       ========================================================================== */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 14px;
+      gap: 8px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--female), var(--male));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: transform 0.15s ease, background 0.2s;
+    }
+
+    .icon-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* ==========================================================================
+       3. VISTAS Y COMPONENTES GENERALES
+       ========================================================================== */
+    .view {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      flex: 1;
+      animation: fadeIn 0.28s ease;
+    }
+
+    .view.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    /* Botones principales táctiles */
+    .btn {
+      width: 100%;
+      padding: 15px 18px;
+      border-radius: var(--radius-md);
+      border: none;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.15s ease, filter 0.2s, box-shadow 0.2s;
+      color: #fff;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--female), var(--male));
+      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.35);
+    }
+
+    .btn-secondary {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+    }
+
+    .btn-truth {
+      background: linear-gradient(135deg, #059669, #10b981);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+      font-size: 1.2rem;
+      padding: 18px;
+    }
+
+    .btn-dare {
+      background: linear-gradient(135deg, #d97706, #f59e0b);
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+      font-size: 1.2rem;
+      padding: 18px;
+    }
+
+    /* ==========================================================================
+       4. CONFIGURACIÓN: FORMA DEL GRUPO E INTENSIDAD
+       ========================================================================== */
+    .shape-grid, .intensity-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .choice-pill {
+      background: var(--bg-elevated);
+      border: 2px solid transparent;
+      border-radius: var(--radius-md);
+      padding: 12px 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text-main);
+    }
+
+    .choice-pill .emoji {
+      font-size: 1.5rem;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .choice-pill .label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: block;
+    }
+
+    .choice-pill.selected {
+      border-color: var(--accent);
+      background: rgba(139, 92, 246, 0.18);
+      box-shadow: 0 0 15px rgba(139, 92, 246, 0.25);
+    }
+
+    .choice-pill[data-intensity="atrevido"].selected {
+      border-color: var(--female);
+      background: var(--female-bg);
+    }
+
+    /* ==========================================================================
+       5. LIENZO VISUAL DE LA FORMA DEL GRUPO (CÍRCULO, CUADRADO, LÍNEA)
+       ========================================================================== */
+    .arena-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      max-height: 340px;
+      margin: 0 auto;
+      background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.2) 100%);
+      border-radius: var(--radius-lg);
+      border: 1px dashed rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .arena-guide {
+      position: absolute;
+      pointer-events: none;
+      opacity: 0.18;
+      border: 2px dashed #fff;
+      transition: all 0.3s ease;
+    }
+
+    .arena-guide.circle {
+      width: 72%;
+      height: 72%;
+      border-radius: 50%;
+    }
+
+    .arena-guide.square {
+      width: 72%;
+      height: 72%;
+      border-radius: 16px;
+    }
+
+    .arena-guide.line {
+      width: 82%;
+      height: 2px;
+      border: none;
+      border-top: 2px dashed #fff;
+    }
+
+    .player-node {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  top 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  transform 0.2s ease,
+                  box-shadow 0.2s ease;
+      z-index: 2;
+      user-select: none;
+    }
+
+    .node-circle {
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #fff;
+      border: 2px solid rgba(255, 255, 255, 0.85);
+      transition: all 0.2s ease;
+    }
+
+    .player-node.F .node-circle {
+      background: linear-gradient(135deg, #ff4d9d, #be185d);
+      box-shadow: 0 4px 12px var(--female-glow);
+    }
+
+    .player-node.M .node-circle {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      box-shadow: 0 4px 12px var(--male-glow);
+    }
+
+    .node-name {
+      margin-top: 3px;
+      font-weight: 700;
+      background: rgba(15, 17, 23, 0.85);
+      padding: 1px 6px;
+      border-radius: 99px;
+      white-space: nowrap;
+      max-width: 74px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* Estados de animación de ruleta y selección */
+    .player-node.roulette-highlight {
+      transform: translate(-50%, -50%) scale(1.25);
+      z-index: 10;
+    }
+
+    .player-node.roulette-highlight .node-circle {
+      border-color: #fff;
+      filter: brightness(1.3);
+    }
+
+    .player-node.selected-winner {
+      transform: translate(-50%, -50%) scale(1.35);
+      z-index: 15;
+      animation: nodePulse 1.2s infinite ease-in-out;
+    }
+
+    .player-node.F.selected-winner .node-circle {
+      box-shadow: 0 0 0 6px rgba(255, 77, 157, 0.35), 0 0 25px var(--female);
+    }
+
+    .player-node.M.selected-winner .node-circle {
+      box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.35), 0 0 25px var(--male);
+    }
+
+    @keyframes nodePulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1.32); }
+      50% { transform: translate(-50%, -50%) scale(1.45); }
+    }
+
+    /* Cartel central sobre la arena */
+    .center-banner {
+      position: absolute;
+      z-index: 20;
+      background: rgba(15, 17, 23, 0.92);
+      backdrop-filter: blur(8px);
+      padding: 12px 20px;
+      border-radius: var(--radius-lg);
+      text-align: center;
+      border: 2px solid var(--accent);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.75);
+      pointer-events: none;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      max-width: 82%;
+    }
+
+    .center-banner.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .center-banner.F {
+      border-color: var(--female);
+      box-shadow: 0 0 25px var(--female-glow);
+    }
+
+    .center-banner.M {
+      border-color: var(--male);
+      box-shadow: 0 0 25px var(--male-glow);
+    }
+
+    .center-banner-tag {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .center-banner-name {
+      font-size: 1.45rem;
+      font-weight: 900;
+      margin-top: 2px;
+    }
+
+    .center-banner.F .center-banner-name { color: var(--female); }
+    .center-banner.M .center-banner-name { color: var(--male); }
+
+    /* ==========================================================================
+       6. FORMULARIO Y LISTA DE JUGADORES
+       ========================================================================== */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    input[type="text"], select, textarea {
+      width: 100%;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+    }
+
+    .gender-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .gender-btn {
+      padding: 14px;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--border-subtle);
+      background: var(--bg-elevated);
+      color: var(--text-main);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .gender-btn[data-gender="F"].active {
+      background: var(--female-bg);
+      border-color: var(--female);
+      color: #fff;
+      box-shadow: 0 0 15px var(--female-glow);
+    }
+
+    .gender-btn[data-gender="M"].active {
+      background: var(--male-bg);
+      border-color: var(--male);
+      color: #fff;
+      box-shadow: 0 0 15px var(--male-glow);
+    }
+
+    .alert-msg {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid var(--danger);
+      color: #fca5a5;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-weight: 600;
+      display: none;
+    }
+
+    .alert-msg.visible {
+      display: block;
+      animation: shake 0.3s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .player-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 240px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .player-chip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      background: var(--bg-elevated);
+      border-left: 4px solid transparent;
+    }
+
+    .player-chip.F {
+      border-left-color: var(--female);
+      background: linear-gradient(90deg, var(--female-bg) 0%, var(--bg-elevated) 60%);
+    }
+
+    .player-chip.M {
+      border-left-color: var(--male);
+      background: linear-gradient(90deg, var(--male-bg) 0%, var(--bg-elevated) 60%);
+    }
+
+    .player-chip-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+    }
+
+    .player-seat {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      background: rgba(0,0,0,0.3);
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+
+    .chip-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .mini-btn {
+      background: rgba(255,255,255,0.08);
+      border: none;
+      color: var(--text-main);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .mini-btn.del {
+      color: #fca5a5;
+      background: rgba(239, 68, 68, 0.15);
+    }
+
+    /* ==========================================================================
+       7. PANTALLA DE JUEGO: TARJETA FLIP, TEMPORIZADOR Y CONTROLES
+       ========================================================================== */
+    .round-badge {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      padding: 8px 14px;
+      border-radius: 99px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .turn-panel {
+      text-align: center;
+      padding: 14px;
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .turn-player-title {
+      font-size: 1.5rem;
+      font-weight: 900;
+      margin: 4px 0 12px;
+    }
+
+    .turn-player-title.F { color: var(--female); }
+    .turn-player-title.M { color: var(--male); }
+
+    .choice-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* Tarjeta 3D Flip */
+    .flip-container {
+      perspective: 1000px;
+      width: 100%;
+      min-height: 230px;
+      display: none;
+    }
+
+    .flip-container.active {
+      display: block;
+    }
+
+    .flip-card {
+      width: 100%;
+      min-height: 230px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .flip-card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .flip-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .flip-front {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border: 2px solid var(--border-subtle);
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 900;
+    }
+
+    .flip-back {
+      transform: rotateY(180deg);
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
+      position: relative;
+      min-height: 230px;
+      height: auto;
+    }
+
+    .flip-back.type-verdad {
+      border-color: var(--truth);
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.14) 0%, var(--bg-card) 45%);
+    }
+
+    .flip-back.type-reto {
+      border-color: var(--dare);
+      background: linear-gradient(180deg, rgba(245, 158, 11, 0.14) 0%, var(--bg-card) 45%);
+    }
+
+    .card-header-tag {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .type-verdad .card-type-label { color: var(--truth); }
+    .type-reto .card-type-label { color: var(--dare); }
+
+    .card-prompt-text {
+      font-size: 1.25rem;
+      font-weight: 700;
+      line-height: 1.45;
+      margin: 18px 0;
+      text-align: center;
+      color: #fff;
+    }
+
+    /* Temporizador para retos */
+    .timer-box {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      margin-bottom: 12px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .timer-box.visible {
+      display: flex;
+    }
+
+    .timer-presets {
+      display: flex;
+      gap: 6px;
+      width: 100%;
+    }
+
+    .timer-preset-btn {
+      flex: 1;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 6px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .timer-display {
+      font-size: 1.6rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      color: var(--dare);
+    }
+
+    .timer-display.urgent {
+      color: var(--danger);
+      animation: pulseText 0.6s infinite;
+    }
+
+    @keyframes pulseText {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .outcome-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .btn-success {
+      background: var(--truth);
+    }
+
+    .btn-pass {
+      background: var(--bg-elevated);
+      border: 1px solid var(--danger);
+      color: #fca5a5;
+    }
+
+    /* ==========================================================================
+       8. MODALES (MARCADOR, AGREGAR PREGUNTAS, AVISO +18)
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 440px;
+      max-height: 85dvh;
+      overflow-y: auto;
+      padding: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .score-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .score-row.F {
+      background: var(--female-bg);
+      border: 1px solid rgba(255, 77, 157, 0.35);
+    }
+
+    .score-row.M {
+      background: var(--male-bg);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+    }
+
+    .score-badge {
+      font-size: 1.1rem;
+      font-weight: 900;
+      padding: 4px 12px;
+      border-radius: 99px;
+      background: rgba(0,0,0,0.4);
+    }
+
+    .score-row.F .score-badge { color: var(--female); }
+    .score-row.M .score-badge { color: var(--male); }
+
+    @media (max-width: 380px) {
+      .brand { font-size: 1.05rem; }
+      .icon-btn { padding: 7px 8px; font-size: 0.78rem; }
+      .card-prompt-text { font-size: 1.1rem; }
+    }
+  </style>
 </head>
 <body>
-<div id="app">
-
-  <!-- CONFIGURACIÓN -->
-  <section id="setup">
-    <h1>🎲 <span>Retos</span></h1>
-    <p class="sub">Pásense el celular y cumplan.</p>
-
-    <h3>Jugadores</h3>
-    <div class="box">
-      <div class="row">
-        <input id="pname" placeholder="Nombre del jugador" maxlength="14" autocomplete="off">
-        <button id="addP" style="white-space:nowrap">+ Añadir</button>
+  <div class="app-container">
+    <!-- CABECERA -->
+    <header>
+      <div class="brand">🔥 Verdad o Reto</div>
+      <div class="header-actions">
+        <button class="icon-btn" id="btnSoundToggle" title="Activar/Desactivar sonido">🔊</button>
+        <button class="icon-btn" id="btnOpenCustom" title="Añadir preguntas">+ Crear</button>
+        <button class="icon-btn" id="btnOpenScores" title="Ver marcador">🏆 <span id="headerLeader">0</span></button>
+        <button class="icon-btn" id="btnResetGame" title="Reiniciar partida">🔄</button>
       </div>
-      <div class="chips" id="chips" style="margin-top:12px"></div>
-    </div>
+    </header>
 
-    <h3>Nivel de los retos</h3>
-    <div class="row" id="levels">
-      <button class="lvl" data-l="suave">😇 Suave<small>para todos</small></button>
-      <button class="lvl" data-l="divertido">🤪 Divertido<small>pasarla bien</small></button>
-      <button class="lvl" data-l="atrevido">😈 Atrevido<small>solo amigos</small></button>
-    </div>
+    <!-- ======================================================================
+         VISTA 1: CONFIGURACIÓN DEL GRUPO Y JUGADORES
+         ====================================================================== -->
+    <section id="viewSetup" class="view active">
+      <!-- Paso 1: Forma e Intensidad -->
+      <div class="card">
+        <h2>1. ¿Cómo están sentados?</h2>
+        <p class="subtitle">Elige la forma del grupo para ubicarlos en pantalla.</p>
+        <div class="shape-grid" id="shapeSelector">
+          <div class="choice-pill selected" data-shape="circle">
+            <span class="emoji">⭕</span>
+            <span class="label">Círculo</span>
+          </div>
+          <div class="choice-pill" data-shape="square">
+            <span class="emoji">🟦</span>
+            <span class="label">Cuadrado</span>
+          </div>
+          <div class="choice-pill" data-shape="line">
+            <span class="emoji">➖</span>
+            <span class="label">Línea</span>
+          </div>
+        </div>
 
-    <h3>Tus propios retos</h3>
-    <div class="box">
-      <textarea id="ctext" rows="2" placeholder="Escribe un reto o una verdad inventada por ustedes"></textarea>
-      <div class="row" style="margin-top:10px">
-        <select id="ctype" style="flex:1"><option value="reto">Reto</option><option value="verdad">Verdad</option></select>
-        <button id="addC">Guardar</button>
+        <h2 style="margin-top: 16px;">2. Intensidad del juego</h2>
+        <div class="intensity-grid" id="intensitySelector">
+          <div class="choice-pill selected" data-intensity="suave">
+            <span class="emoji">😇</span>
+            <span class="label">Suave</span>
+          </div>
+          <div class="choice-pill" data-intensity="divertido">
+            <span class="emoji">🌶️</span>
+            <span class="label">Divertido</span>
+          </div>
+          <div class="choice-pill" data-intensity="atrevido">
+            <span class="emoji">🔞</span>
+            <span class="label">Atrevido</span>
+          </div>
+        </div>
       </div>
-      <div id="clist" style="margin-top:8px"></div>
+
+      <!-- Vista previa en tiempo real de la distribución -->
+      <div class="arena-wrapper" id="setupArena">
+        <div class="arena-guide circle" id="setupGuide"></div>
+      </div>
+
+      <!-- Paso 2: Agregar / Editar Jugadores -->
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <h2 id="formTitle" style="margin:0;">3. Agrega jugadores</h2>
+          <span style="font-size:0.85rem; color:var(--text-muted); font-weight:700;" id="playerCounter">0 / 25</span>
+        </div>
+        <p class="subtitle">Agrégalos en el orden en que están sentados (mín. 2, máx. 25).</p>
+
+        <div class="input-group">
+          <input type="text" id="playerNameInput" placeholder="Nombre del jugador..." maxlength="18" autocomplete="off" />
+          <div class="gender-selector">
+            <button type="button" class="gender-btn active" data-gender="F" id="btnGenderF">👩 Mujer</button>
+            <button type="button" class="gender-btn" data-gender="M" id="btnGenderM">👨 Hombre</button>
+          </div>
+          <div class="alert-msg" id="setupAlert"></div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="btn btn-secondary" id="btnAddPlayer">➕ Agregar jugador</button>
+            <button type="button" class="btn btn-secondary" id="btnCancelEdit" style="display:none; width:auto;">Cancelar</button>
+          </div>
+        </div>
+
+        <div class="player-list" id="playerList" style="margin-top: 12px;"></div>
+      </div>
+
+      <button type="button" class="btn btn-primary" id="btnStartGame">🚀 ¡Empezar partida!</button>
+    </section>
+
+    <!-- ======================================================================
+         VISTA 2: TABLERO DE JUEGO ACTIVO
+         ====================================================================== -->
+    <section id="viewGame" class="view">
+      <div class="round-badge">
+        <span>Ronda <strong id="roundNumber" style="color:#fff;">1</strong></span>
+        <span>Modo: <strong id="activeModeLabel" style="color:#fff;">Suave</strong></span>
+        <span>Faltan: <strong id="remainingCycleCount" style="color:#fff;">0</strong></span>
+      </div>
+
+      <!-- Arena visual con selección por ruleta -->
+      <div class="arena-wrapper" id="gameArena">
+        <div class="arena-guide circle" id="gameGuide"></div>
+        <div class="center-banner" id="centerBanner">
+          <div class="center-banner-tag">Turno de</div>
+          <div class="center-banner-name" id="centerBannerName">Jugador</div>
+        </div>
+      </div>
+
+      <!-- Panel de decisión: Verdad o Reto -->
+      <div class="turn-panel" id="turnDecisionPanel">
+        <div style="font-size:0.85rem; color:var(--text-muted);" id="turnStatusSubtitle">Seleccionando jugador...</div>
+        <div class="turn-player-title" id="currentPlayerName">---</div>
+
+        <div class="choice-buttons" id="vrButtons" style="display:none;">
+          <button type="button" class="btn btn-truth" id="btnChooseTruth">🟢 VERDAD</button>
+          <button type="button" class="btn btn-dare" id="btnChooseDare">🔥 RETO</button>
+        </div>
+      </div>
+
+      <!-- Tarjeta con efecto Flip -->
+      <div class="flip-container" id="flipContainer">
+        <div class="flip-card" id="flipCard">
+          <div class="flip-face flip-front">
+            <span>❓</span>
+          </div>
+          <div class="flip-face flip-back" id="flipBack">
+            <div class="card-header-tag">
+              <span class="card-type-label" id="cardTypeLabel">VERDAD</span>
+              <span id="cardPlayerBadge" style="color:var(--text-muted);">Jugador</span>
+            </div>
+
+            <div class="card-prompt-text" id="cardPromptText">
+              Aquí aparecerá la pregunta o reto.
+            </div>
+
+            <!-- Temporizador opcional para retos -->
+            <div class="timer-box" id="timerBox">
+              <div class="timer-presets">
+                <button type="button" class="timer-preset-btn" data-sec="30">⏱️ 30s</button>
+                <button type="button" class="timer-preset-btn" data-sec="60">⏱️ 60s</button>
+                <button type="button" class="timer-preset-btn" data-sec="90">⏱️ 90s</button>
+              </div>
+              <div class="timer-display" id="timerDisplay">00:00</div>
+            </div>
+
+            <div class="outcome-buttons">
+              <button type="button" class="btn btn-pass" id="btnPass">❌ Pasar (-1)</button>
+              <button type="button" class="btn btn-success" id="btnComplete">✅ Cumplido (+1)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: MARCADOR DE PUNTOS
+       ======================================================================== -->
+  <div class="modal-backdrop" id="modalScores">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 style="margin:0;">🏆 Marcador</h2>
+        <button class="icon-btn" data-close="modalScores">✕</button>
+      </div>
+      <div id="scoreboardList"></div>
     </div>
+  </div>
 
-    <div style="flex:1"></div>
-    <button class="primary" id="start">¡Empezar!</button>
-    <button class="ghost" id="resume" hidden>Continuar partida</button>
-    <p class="hint">Todo se guarda en tu celular. Funciona sin internet.</p>
-  </section>
-
-  <!-- TURNO -->
-  <section id="turn" hidden>
-    <div class="top">
-      <span id="round"></span>
-      <button id="toScores">🏆 Puntos</button>
+  <!-- ========================================================================
+       MODAL: AGREGAR PREGUNTAS / RETOS PROPIOS
+       ======================================================================== -->
+  <div class="modal-backdrop" id="modalCustom">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 style="margin:0;">✍️ Crear Verdad o Reto</h2>
+        <button class="icon-btn" data-close="modalCustom">✕</button>
+      </div>
+      <p class="subtitle">Se guardarán en tu dispositivo para usarlas en tus partidas.</p>
+      <div class="input-group">
+        <select id="customIntensity">
+          <option value="suave">😇 Modo Suave</option>
+          <option value="divertido">🌶️ Modo Divertido</option>
+          <option value="atrevido">🔞 Modo Atrevido (+18)</option>
+        </select>
+        <select id="customType">
+          <option value="verdad">🟢 Verdad</option>
+          <option value="reto">🔥 Reto</option>
+        </select>
+        <textarea id="customText" rows="3" placeholder="Escribe aquí tu pregunta o reto..."></textarea>
+        <div class="alert-msg" id="customAlert"></div>
+        <button type="button" class="btn btn-primary" id="btnSaveCustom">💾 Guardar en mi banco</button>
+      </div>
+      <div id="customCountInfo" style="margin-top:12px; font-size:0.82rem; color:var(--text-muted); text-align:center;"></div>
     </div>
-    <div class="center">
-      <p class="sub">Le toca a</p>
-      <h2 class="turnname" id="who"></h2>
-      <p class="sub" style="margin-bottom:8px">¿Qué eliges?</p>
-      <button class="big truth" data-t="verdad">🗣️ Verdad</button>
-      <button class="big dare" data-t="reto">🔥 Reto</button>
-      <button class="big rand" data-t="azar">🎰 Sorpréndeme</button>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: AVISO +18 MODO ATREVIDO
+       ======================================================================== -->
+  <div class="modal-backdrop" id="modalAdultWarning">
+    <div class="modal-card" style="border-color: var(--female);">
+      <div class="modal-header">
+        <h2 style="margin:0; color:var(--female);">🔞 Aviso: Modo Atrevido (+18)</h2>
+      </div>
+      <p style="font-size:0.95rem; margin-bottom:16px; color:var(--text-main);">
+        Este modo contiene preguntas íntimas y retos picantes pensados exclusivamente para adultos con consentimiento mutuo. Nadie está obligado a responder o cumplir algo que le incomode.
+      </p>
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="btn btn-secondary" id="btnCancelAdult">Volver</button>
+        <button type="button" class="btn btn-primary" id="btnConfirmAdult">Somos +18, continuar</button>
+      </div>
     </div>
-  </section>
+  </div>
 
-  <!-- TARJETA -->
-  <section id="cardsec" hidden>
-    <div class="cardwrap">
-      <p class="who" id="cwho"></p>
-      <div class="card" id="card"><div class="tag" id="ctag"></div><div class="txt" id="ctxt"></div></div>
-      <button class="ok" id="done">✅ Cumplido (+1)</button>
-      <button class="skip" id="pass">⏭️ Paso (−1)</button>
-    </div>
-  </section>
+  <script>
+    /* ==========================================================================
+       1. BANCO DE DATOS: 30 VERDADES Y 30 RETOS POR MODO (180 TOTAL)
+       ========================================================================== */
+    const DEFAULT_BANK = {
+      suave: {
+        verdades: [
+          "¿Cuál ha sido el momento más vergonzoso que has vivido en público?",
+          "¿Qué película o serie has visto más veces de las que te atreves a admitir?",
+          "¿Cuál es tu mayor miedo irracional?",
+          "¿Qué es lo más infantil que sigues haciendo hoy en día?",
+          "¿Alguna vez fingiste estar enfermo para no ir a estudiar o trabajar?",
+          "¿Cuál fue tu peor corte de cabello o cambio de look?",
+          "¿Qué comida detestas aunque a todo el mundo le encante?",
+          "¿Cuál es el talento más inútil que tienes?",
+          "¿Alguna vez enviaste un mensaje hablando mal de alguien a esa misma persona?",
+          "¿Qué canción escuchas a escondidas porque te da pena que sepan que te gusta?",
+          "¿Cuál fue tu primer amor platónico de la infancia o adolescencia?",
+          "¿Qué es lo más caro que has roto por accidente?",
+          "¿Alguna vez te quedaste dormido en un lugar muy inapropiado?",
+          "¿Cuál es la mentira más grande que dijiste cuando eras niño?",
+          "¿Si pudieras borrar un recuerdo de tu mente, cuál sería?",
+          "¿Qué hábito extraño tienes cuando estás solo en casa?",
+          "¿Cuál ha sido el peor regalo que has recibido y tuviste que fingir que te gustó?",
+          "¿A qué celebridad te gustaría parecerte por un día?",
+          "¿Cuál es el historial de búsqueda más raro que tienes en tu teléfono?",
+          "¿Qué harías si ganaras la lotería mañana mismo?",
+          "¿Alguna vez lloraste viendo una película animada? ¿Cuál?",
+          "¿Cuál es tu mayor inseguridad física o de personalidad?",
+          "¿Qué es lo más impulsivo que has comprado por internet?",
+          "¿Si tuvieras que vivir sin una red social para siempre, cuál eliminarías?",
+          "¿Cuál fue la peor nota que sacaste en la escuela?",
+          "¿Qué apodo tenías de pequeño que odiabas?",
+          "¿Alguna vez te reíste en un momento serio donde estaba prohibido reírse?",
+          "¿Cuál es el sueño más extraño que recuerdas haber tenido?",
+          "¿Qué cualidad admiras más de la persona que está a tu derecha?",
+          "¿Si pudieras viajar en el tiempo solo para ver un evento, cuál elegirías?"
+        ],
+        retos: [
+          "Imita el acento de otro país hasta que llegue tu próximo turno.",
+          "Haz tu mejor imitación de un animal elegido por el grupo durante 15 segundos.",
+          "Habla en cámara lenta durante los próximos 30 segundos.",
+          "Intenta lamerte el codo durante 10 segundos con toda tu energía.",
+          "Haz 15 sentadillas mientras cuentas en voz alta con voz de ópera.",
+          "Deja que el grupo elija una pose y mantente congelado como estatua por 30 segundos.",
+          "Canta el coro de tu canción favorita sin música y con mucho sentimiento.",
+          "Cuenta un chiste malo; si nadie se ríe, haz 5 flexiones.",
+          "Camina como modelo de pasarela de un extremo al otro de la habitación.",
+          "Haz equilibrio en un solo pie con los ojos cerrados durante 20 segundos.",
+          "Di el abecedario al revés lo más rápido que puedas.",
+          "Actúa como un robot cada vez que hables hasta la siguiente ronda.",
+          "Haz tu mejor cara de villano de telenovela y di una frase dramática.",
+          "Intenta hacer malabares con tres objetos suaves que haya cerca.",
+          "Baila sin música durante 20 segundos como si estuvieras en un concierto.",
+          "Narra en vivo como comentarista de fútbol lo que está haciendo otro jugador.",
+          "Ponte un objeto ligero en la cabeza y da una vuelta completa sin que se caiga.",
+          "Haz 10 saltos de tijera gritando el nombre de tu comida favorita en cada salto.",
+          "Imita la risa de otro jugador del grupo hasta que adivinen quién es.",
+          "Habla rimando todas tus frases durante el próximo minuto.",
+          "Haz una declaración de amor apasionada a una silla o cojín.",
+          "Dibuja un autorretrato en el aire con la nariz.",
+          "Haz el sonido de tres instrumentos musicales distintos con la boca.",
+          "Mantén una expresión totalmente seria mientras el grupo intenta hacerte reír por 20 segundos.",
+          "Inventa un anuncio de televisión vendiendo tus propios zapatos.",
+          "Camina en cámara rápida por toda la sala durante 15 segundos.",
+          "Haz tu mejor imitación de un presentador de noticias dando una noticia absurda.",
+          "Di un trabalenguas difícil tres veces seguidas sin equivocarte.",
+          "Actúa como si estuvieras atrapado dentro de una caja invisible.",
+          "Elogia sinceramente a cada persona del grupo en menos de 20 segundos."
+        ]
+      },
+      divertido: {
+        verdades: [
+          "¿Quién de este grupo te dio la peor primera impresión y por qué?",
+          "¿Cuál es el rumor más falso que han inventado sobre ti?",
+          "¿Alguna vez has stalkeado tanto a alguien que diste 'me gusta' por accidente a una foto vieja?",
+          "¿Qué es lo más atrevido que has hecho por llamar la atención de alguien que te gustaba?",
+          "¿A quién de esta sala llamarías primero si tuvieras que esconder un secreto enorme?",
+          "¿Cuál fue tu peor cita romántica y qué salió mal?",
+          "¿Alguna vez te has enamorado de alguien que estaba prohibido para ti?",
+          "¿Qué es lo más vergonzoso que tienes guardado en la galería de tu teléfono?",
+          "¿Has revisado alguna vez el teléfono de una pareja o amigo sin permiso?",
+          "¿Cuál es tu mayor 'red flag' en una relación?",
+          "¿Alguna vez dijiste 'te quiero' sin sentirlo de verdad?",
+          "¿Quién de los presentes crees que sobreviviría menos tiempo en un apocalipsis zombi?",
+          "¿Qué es lo más loco que has hecho en una fiesta?",
+          "¿Alguna vez ghosteaste a alguien sin darle explicaciones? ¿Por qué?",
+          "¿Cuál ha sido tu mayor ataque de celos?",
+          "¿Qué defecto tuyo te cuesta más aceptar frente a los demás?",
+          "¿Alguna vez saliste con dos personas al mismo tiempo?",
+          "¿Cuál es la excusa más absurda que usaste para cancelar un plan a última hora?",
+          "¿De quién de este grupo te fías menos para guardar un secreto?",
+          "¿Qué es lo más raro que te resulta atractivo en otra persona?",
+          "¿Alguna vez te arrepentiste de un beso justo después de darlo?",
+          "¿Cuál es el mensaje más vergonzoso que has enviado estando pasado de copas o con sueño?",
+          "¿Qué harías si hoy te encontraras cara a cara con tu ex?",
+          "¿Alguna vez fingiste que te gustaba el regalo o la comida de una cita?",
+          "¿Quién de esta habitación tiene el mejor estilo y quién el más cuestionable?",
+          "¿Cuál es tu mayor placer culposo?",
+          "¿Has mentido alguna vez en este juego para quedar bien?",
+          "¿Qué es algo que todos creen de ti pero es completamente falso?",
+          "¿Cuál fue el momento en que más tierra quisiste que te tragara?",
+          "¿Si tuvieras que intercambiar vidas con alguien del grupo por una semana, quién sería?"
+        ],
+        retos: [
+          "Deja que el jugador de tu izquierda envíe un emoji aleatorio a tu último chat.",
+          "Muestra la última foto de tu galería al resto del grupo (sin borrar nada antes).",
+          "Lee en voz alta el último mensaje que enviaste por WhatsApp o Instagram.",
+          "Deja que alguien del grupo te peine o despeine como quiera durante una ronda.",
+          "Haz una llamada de 10 segundos a un amigo y dile: 'Solo llamaba para decirte que eres increíble' y cuelga.",
+          "Publica una historia en tus redes con una selfie haciendo una mueca elegida por el grupo (puedes borrarla en 5 min).",
+          "Deja que el grupo revise tu historial de canciones más escuchadas este mes.",
+          "Haz 10 flexiones mientras dices el nombre de tu crush en cada repetición.",
+          "Intercambia una prenda de vestir (chaqueta, gorra, reloj o zapatos) con otro jugador voluntario por dos rondas.",
+          "Manda un audio de 5 segundos cantando a un grupo de chat que tengas.",
+          "Deja que otro jugador escriba un estado gracioso en tu perfil o nota de Instagram.",
+          "Actúa una escena dramática de ruptura amorosa con un vaso de agua.",
+          "Baila una canción lenta imaginaria contigo mismo durante 25 segundos.",
+          "Di tres cosas que te gusten de la persona que está frente a ti mirándola a los ojos.",
+          "Habla con voz muy aguda (de ardilla) durante los próximos dos turnos.",
+          "Deja que el grupo elija tu foto de perfil durante las próximas 2 horas.",
+          "Haz un tutorial de maquillaje o cuidado facial usando solo tus manos sin productos.",
+          "Imita cómo camina y habla el jugador que está a tu derecha.",
+          "Envía un mensaje que diga 'Tenemos que hablar...' a un contacto que el grupo apruebe y luego aclara que es un reto.",
+          "Sostén un cubo de hielo en la mano hasta que se derrita o pasen 45 segundos.",
+          "Haz tu mejor pose de portada de revista y deja que te tomen una foto.",
+          "Cuenta una anécdota vergonzosa tuya como si fuera una película de terror.",
+          "Haz 20 segundos de plancha abdominal mientras respondes preguntas rápidas del grupo.",
+          "Cambia de asiento con la persona que tenga más puntos en el marcador.",
+          "Pide disculpas dramáticas a la pared por haberla ignorado toda la noche.",
+          "Haz un rap improvisado de 15 segundos mencionando a tres personas del grupo.",
+          "Deja que el jugador con menos puntos te ponga un apodo para el resto de la partida.",
+          "Mira fijamente a alguien del grupo sin parpadear ni reír durante 30 segundos.",
+          "Haz tu mejor imitación de un influencer promocionando un vaso vacío.",
+          "Confiesa un secreto pequeño que nadie en la sala sepa todavía."
+        ]
+      },
+      atrevido: {
+        verdades: [
+          "¿Cuál es tu fantasía más recurrente que nunca le has contado a una pareja?",
+          "¿Cuál ha sido el lugar más inusual o arriesgado donde has tenido un momento íntimo?",
+          "¿Qué es lo primero en lo que te fijas físicamente cuando alguien te atrae?",
+          "¿Cuál ha sido tu mejor experiencia romántica o íntima hasta ahora?",
+          "¿Alguna vez has tenido un sueño subido de tono con alguien que está en esta habitación?",
+          "¿Qué parte de tu cuerpo consideras tu mayor arma de seducción?",
+          "¿Prefieres tomar el control o dejar que la otra persona lleve la iniciativa?",
+          "¿Cuál es la propuesta más atrevida que te han hecho y aceptaste?",
+          "¿Alguna vez has enviado fotos comprometedoras de las que luego te arrepentiste?",
+          "¿Qué es algo que te enciende al instante en una cita?",
+          "¿Cuál ha sido tu mayor metida de pata en un momento íntimo?",
+          "¿Alguna vez has tenido una aventura de una sola noche? ¿Cómo fue?",
+          "¿Con quién de este grupo tendrías una cita a ciegas si ambos estuvieran solteros?",
+          "¿Qué prenda de ropa te hace sentir más atractivo/a?",
+          "¿Cuál es tu límite absoluto que jamás cruzarías en la intimidad?",
+          "¿Alguna vez te descubrieron en un momento comprometedor?",
+          "¿Qué es lo más espontáneo que has hecho por deseo o atracción?",
+          "¿Prefieres las luces encendidas, tenues o completamente apagadas?",
+          "¿Alguna vez has fingido estar disfrutando un momento íntimo para no herir sentimientos?",
+          "¿Cuál es tu recuerdo más intenso con un amor del pasado?",
+          "¿Qué tipo de beso te vuelve completamente loco/a?",
+          "¿Alguna vez has usado juegos, disfraces o accesorios en pareja?",
+          "¿Qué canción pondrías para crear el ambiente perfecto en una noche especial?",
+          "¿Cuál es el cumplido más picante que te han dicho y te encantó?",
+          "¿Has tenido alguna vez química instantánea con alguien sin siquiera cruzar palabra?",
+          "¿Qué es algo nuevo que te gustaría experimentar en pareja algún día?",
+          "¿Cuál es tu mayor debilidad cuando alguien intenta seducirte?",
+          "¿Alguna vez te has sentido atraído/a por la pareja de un conocido?",
+          "¿Qué opinas de las relaciones abiertas o sin etiquetas?",
+          "¿Si pudieras repetir una noche de tu vida exactamente igual, cuál elegirías?"
+        ],
+        retos: [
+          "Susurra un cumplido atrevido al oído del jugador que elijas (con su permiso).",
+          "Baila de forma sensual durante 20 segundos con la música que ponga el grupo.",
+          "Muerde suavemente tu labio inferior mientras miras fijamente a alguien por 10 segundos.",
+          "Quítate una prenda externa no esencial (calcetines, suéter, cinturón o accesorio) por dos rondas.",
+          "Haz un masaje de hombros de 20 segundos a un jugador que acepte voluntariamente.",
+          "Envía un emoji sugerente (🔥 o 😉) a la tercera persona de tus mensajes recientes.",
+          "Describe con lujo de detalles tu beso ideal usando solo gestos y miradas.",
+          "Deja que otro jugador voluntario te dé un beso en la mejilla o en la mano.",
+          "Haz tu mejor cara de seducción frente a la cámara del teléfono de un amigo.",
+          "Di con voz seductora la frase más absurda que se te ocurra (ej. 'Me encanta pagar impuestos').",
+          "Siéntate muy cerca (hombro con hombro) del jugador de tu elección durante la siguiente ronda.",
+          "Recrea una escena romántica de película con otro jugador voluntario durante 15 segundos.",
+          "Deja que el grupo te haga una pregunta íntima extra sin derecho a evadirla.",
+          "Muestra cómo darías un beso apasionado usando el dorso de tu propia mano.",
+          "Confiesa al oído de alguien del grupo quién te parece la persona más atractiva de la sala.",
+          "Haz 10 segundos de baile lento pegado a una almohada o silla.",
+          "Lame un poco de sal, limón o bebida del borde de tu vaso de la forma más lenta posible.",
+          "Di en voz alta tres cosas que te gustan del físico de la persona a tu izquierda.",
+          "Ponte una venda o cierra los ojos y adivina quién del grupo te toca el hombro.",
+          "Haz una pasarela coqueta y termina con un guiño hacia el jugador con más puntos.",
+          "Escribe en el chat del grupo una palabra que defina tu estado de ánimo esta noche.",
+          "Mantén contacto visual intenso con otro jugador voluntario durante 30 segundos sin reírte.",
+          "Dale un abrazo largo de 10 segundos a la persona que esté frente a ti.",
+          "Imita cómo coqueteas cuando alguien realmente te gusta en un bar o fiesta.",
+          "Deja que alguien elija una zona de tu brazo para dibujar un corazón con el dedo.",
+          "Cuenta en 15 segundos tu mejor truco para conquistar a alguien.",
+          "Haz una pose sugestiva digna de un calendario durante 10 segundos.",
+          "Bebe un sorbo de tu bebida sin usar las manos (con cuidado).",
+          "Elige a dos personas del grupo y di qué tipo de pareja harían.",
+          "Dedica una mirada intensa y una sonrisa pícara a cada miembro del grupo antes de tu próximo turno."
+        ]
+      }
+    };
 
-  <!-- PUNTOS -->
-  <section id="scores" hidden>
-    <h1>🏆 <span>Puntos</span></h1>
-    <div id="slist" style="display:flex;flex-direction:column;gap:10px"></div>
-    <div style="flex:1"></div>
-    <button class="primary" id="back">Seguir jugando</button>
-    <button class="ghost" id="reset">Terminar y volver al inicio</button>
-  </section>
+    /* ==========================================================================
+       2. ESTADO GLOBAL Y PERSISTENCIA (localStorage)
+       ========================================================================== */
+    const STORAGE_KEY_GAME = "vor_game_state_v1";
+    const STORAGE_KEY_CUSTOM = "vor_custom_bank_v1";
 
-</div>
+    let state = {
+      screen: "setup", // 'setup' | 'game'
+      shape: "circle", // 'circle' | 'square' | 'line'
+      intensity: "suave", // 'suave' | 'divertido' | 'atrevido'
+      players: [], // { id, name, gender: 'F'|'M', score: 0 }
+      round: 1,
+      playedInCycle: [], // IDs de jugadores que ya jugaron en el ciclo actual
+      currentPlayerId: null,
+      currentChoice: null, // 'verdad' | 'reto' | null
+      currentPrompt: "",
+      usedPrompts: {
+        suave: { verdades: [], retos: [] },
+        divertido: { verdades: [], retos: [] },
+        atrevido: { verdades: [], retos: [] }
+      },
+      soundEnabled: true
+    };
 
-<script>
-/* ===================== BANCO DE RETOS ===================== */
-const DB = {
-  suave: {
-    verdad: [
-      "¿Cuál ha sido tu momento más vergonzoso en público?",
-      "¿Cuál es la mentira más grande que le has dicho a tu mamá?",
-      "¿Qué es lo más raro que has buscado en Google?",
-      "¿Cuál es tu miedo más irracional?",
-      "¿Qué canción te da pena admitir que te encanta?",
-      "¿Cuál es el peor regalo que has recibido?",
-      "¿Qué hábito tuyo crees que molesta a los demás?",
-      "¿Cuál fue tu peor salida o cita?",
-      "¿Qué es lo más loco que has hecho por dinero?",
-      "¿Qué película o serie te hizo llorar y nunca lo admitiste?",
-      "¿Cuál es el apodo más ridículo que te han puesto?",
-      "¿Qué haces cuando estás solo/a que nadie sabe?",
-      "¿Cuál ha sido tu peor corte de pelo?",
-      "¿Qué talento inútil tienes?"
-    ],
-    reto: [
-      "Habla con acento extranjero durante las próximas 3 rondas.",
-      "Haz tu mejor imitación de otra persona del grupo.",
-      "Cuenta un chiste. Si nadie se ríe, cuentas otro.",
-      "Baila 20 segundos sin música.",
-      "Di el abecedario al revés lo más rápido que puedas.",
-      "Haz 10 sentadillas.",
-      "Imita a un animal hasta que alguien adivine cuál es.",
-      "Canta el coro de la última canción que escuchaste.",
-      "Habla en rima hasta tu próximo turno.",
-      "Hazle un cumplido sincero a cada jugador.",
-      "Mantén el equilibrio en un pie durante 30 segundos.",
-      "Cuenta del 1 al 20 sin reírte mientras todos te hacen caras.",
-      "Haz tu mejor cara de susto y mantenla 10 segundos.",
-      "Camina como modelo por toda la sala."
-    ]
-  },
-  divertido: {
-    verdad: [
-      "¿Cuál es el chisme más grande que sabes y no has contado?",
-      "¿Quién de aquí crees que se casa primero?",
-      "¿Quién del grupo es el más tacaño?",
-      "¿Cuál es tu secreto más tonto?",
-      "Si pudieras cambiar de vida con alguien del grupo por un día, ¿con quién y por qué?",
-      "¿Quién del grupo tarda más en responder un mensaje?",
-      "¿Cuál es la peor excusa que has usado para no salir?",
-      "¿Qué es lo más caro que has roto?",
-      "¿Quién del grupo sobreviviría más en un apocalipsis zombie?",
-      "¿Qué opinión impopular tienes que nadie aquí comparte?",
-      "¿Quién del grupo es el más dramático?",
-      "¿Cuál es la cosa más infantil que todavía haces?",
-      "¿A quién de aquí le prestarías dinero sin pensarlo?",
-      "¿Cuál es la peor mentira que has dicho para zafarte de algo?"
-    ],
-    reto: [
-      "Enseña la última foto de tu galería, sin editarla.",
-      "Haz una declaración de amor dramática a un objeto de la habitación.",
-      "Cuenta lo que hiciste hoy como si fueras narrador de telenovela.",
-      "Habla como locutor de radio hasta tu próximo turno.",
-      "Imita el baile de otro jugador hasta que adivinen quién es.",
-      "Pon cara de enamorado/a mirando a otro jugador durante 15 segundos.",
-      "Manda un audio a un amigo diciendo solo «te extraño» y sin explicar nada.",
-      "Deja que el grupo te ponga una pose y te tome una foto.",
-      "Haz un anuncio de TV para venderle a alguien el celular que tienes en la mano.",
-      "Intenta lamerte el codo. Todos te miran.",
-      "Haz un mini discurso de 20 segundos como si ganaras un Óscar.",
-      "Escribe con la nariz tu nombre en el aire, letra por letra.",
-      "Cuenta un chisme inventado y trata de que todos se lo crean.",
-      "Habla sin mover los labios durante 30 segundos."
-    ]
-  },
-  atrevido: {
-    verdad: [
-      "¿Quién de aquí te parece más atractivo/a?",
-      "¿Cómo fue tu primer beso?",
-      "¿Alguna vez te enamoraste de alguien que no debías?",
-      "¿Has stalkeado a tu ex recientemente?",
-      "¿Qué es lo más atrevido que has hecho por alguien que te gustaba?",
-      "¿Cuál es tu mayor red flag?",
-      "¿Con quién del grupo saldrías a una cita a ciegas?",
-      "¿Cuál es el mensaje más vergonzoso que le has mandado a la persona equivocada?",
-      "¿Qué te enamora de una persona a primera vista?",
-      "¿Has fingido que alguien te gustaba para no herirlo/a?",
-      "¿Cuál es la peor cita que has tenido?",
-      "¿Qué es lo más raro que has hecho para llamar la atención de alguien?"
-    ],
-    reto: [
-      "Enséñale al grupo tus últimas 5 búsquedas en Instagram.",
-      "Di en voz alta lo que más te gusta de cada jugador.",
-      "Pon tu mejor mirada seductora a la cámara frontal y enséñasela al grupo.",
-      "Dile a alguien del grupo algo que nunca le has dicho.",
-      "Deja que otro jugador lea tu último chat con tu mejor amigo/a (solo en voz alta lo que tú aceptes).",
-      "Manda un «te estaba pensando» a la última persona con quien chateaste, con el grupo mirando.",
-      "Cuéntale al grupo cómo coqueteas, con un jugador como «víctima».",
-      "Deja que el grupo escoja a quién le mandas un emoji 😘 por mensaje.",
-      "Describe a tu pareja ideal en 15 segundos sin pensarlo.",
-      "Haz tu mejor pose de portada de revista y que alguien te fotografíe.",
-      "Di con quién del grupo te irías de viaje y por qué.",
-      "Recita un piropo cursi improvisado a quien tú elijas."
-    ]
-  }
-};
+    let customBank = {
+      suave: { verdades: [], retos: [] },
+      divertido: { verdades: [], retos: [] },
+      atrevido: { verdades: [], retos: [] }
+    };
 
-/* ===================== ESTADO ===================== */
-const KEY = "retos-app-v1";
-const def = () => ({players:[], levels:["suave","divertido"], idx:0, turns:0, custom:[], used:{}, started:false});
-let S;
-try { S = Object.assign(def(), JSON.parse(localStorage.getItem(KEY) || "{}")); } catch(e){ S = def(); }
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} };
-const $ = s => document.querySelector(s);
-const show = id => document.querySelectorAll("section").forEach(s => s.hidden = s.id !== id);
-const buzz = n => { try { navigator.vibrate && navigator.vibrate(n); } catch(e){} };
-const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+    let selectedGender = "F";
+    let editingPlayerId = null;
+    let isSpinning = false;
+    let timerInterval = null;
+    let timerSecondsLeft = 0;
 
-/* ===================== CONFIGURACIÓN ===================== */
-function renderSetup(){
-  $("#chips").innerHTML = S.players.map((p,i) =>
-    `<span class="chip">${esc(p.name)}<b data-i="${i}">✕</b></span>`).join("")
-    || `<span class="hint">Añade al menos 2 jugadores</span>`;
-  document.querySelectorAll(".lvl").forEach(b => b.classList.toggle("on", S.levels.includes(b.dataset.l)));
-  $("#clist").innerHTML = S.custom.map((c,i) =>
-    `<div class="custom-item"><em>${c.type}</em><span>${esc(c.text)}</span><b data-i="${i}">✕</b></div>`).join("");
-  $("#start").disabled = S.players.length < 2 || !S.levels.length;
-  $("#resume").hidden = !(S.started && S.players.length >= 2);
-}
-function addPlayer(){
-  const v = $("#pname").value.trim();
-  if(!v) return;
-  if(S.players.some(p => p.name.toLowerCase() === v.toLowerCase())){ $("#pname").value=""; return; }
-  S.players.push({name:v, score:0});
-  $("#pname").value = ""; save(); renderSetup(); $("#pname").focus();
-}
-$("#addP").onclick = addPlayer;
-$("#pname").addEventListener("keydown", e => { if(e.key === "Enter") addPlayer(); });
-$("#chips").onclick = e => {
-  const i = e.target.dataset.i; if(i === undefined) return;
-  S.players.splice(+i,1); S.started = false; save(); renderSetup();
-};
-$("#levels").onclick = e => {
-  const b = e.target.closest(".lvl"); if(!b) return;
-  const l = b.dataset.l;
-  S.levels = S.levels.includes(l) ? S.levels.filter(x => x !== l) : [...S.levels, l];
-  save(); renderSetup();
-};
-$("#addC").onclick = () => {
-  const t = $("#ctext").value.trim(); if(!t) return;
-  S.custom.push({text:t, type:$("#ctype").value});
-  $("#ctext").value = ""; save(); renderSetup();
-};
-$("#clist").onclick = e => {
-  const i = e.target.dataset.i; if(i === undefined) return;
-  S.custom.splice(+i,1); save(); renderSetup();
-};
-$("#start").onclick = () => {
-  S.players.forEach(p => p.score = 0);
-  S.idx = 0; S.turns = 0; S.used = {}; S.started = true; save(); goTurn();
-};
-$("#resume").onclick = goTurn;
-
-/* ===================== TURNOS ===================== */
-function goTurn(){
-  const n = S.players.length;
-  $("#who").textContent = S.players[S.idx].name;
-  $("#round").textContent = "Ronda " + (Math.floor(S.turns / n) + 1);
-  show("turn");
-}
-function pick(type){
-  let all = [];
-  S.levels.forEach(l => DB[l][type].forEach(t => all.push(t)));
-  S.custom.filter(c => c.type === type).forEach(c => all.push(c.text));
-  let fresh = all.filter(t => !S.used[type + "|" + t]);
-  if(!fresh.length){
-    Object.keys(S.used).filter(k => k.startsWith(type + "|")).forEach(k => delete S.used[k]);
-    fresh = all;
-  }
-  const t = fresh[Math.floor(Math.random() * fresh.length)];
-  S.used[type + "|" + t] = 1; save();
-  return t;
-}
-let busy = false;
-function draw(type){
-  if(busy) return; busy = true;
-  const real = type === "azar" ? (Math.random() < .5 ? "verdad" : "reto") : type;
-  const text = pick(real);
-  const card = $("#card");
-  $("#cwho").textContent = S.players[S.idx].name + ", es tu turno";
-  card.className = "card shuffle " + (real === "verdad" ? "truth" : "dare");
-  $("#ctag").textContent = real === "verdad" ? "🗣️ Verdad" : "🔥 Reto";
-  show("cardsec");
-  buzz(30);
-  const pool = [...DB.suave.verdad, ...DB.suave.reto, ...DB.divertido.reto];
-  let n = 0;
-  const iv = setInterval(() => {
-    $("#ctxt").textContent = pool[Math.floor(Math.random() * pool.length)];
-    if(++n > (type === "azar" ? 10 : 4)){
-      clearInterval(iv);
-      card.className = "card " + (real === "verdad" ? "truth" : "dare");
-      $("#ctxt").textContent = text;
-      buzz([20,40,20]); busy = false;
+    function loadFromStorage() {
+      try {
+        const savedCustom = localStorage.getItem(STORAGE_KEY_CUSTOM);
+        if (savedCustom) {
+          customBank = JSON.parse(savedCustom);
+        }
+        const savedGame = localStorage.getItem(STORAGE_KEY_GAME);
+        if (savedGame) {
+          const parsed = JSON.parse(savedGame);
+          state = { ...state, ...parsed };
+        }
+      } catch (e) {
+        console.warn("No se pudo leer localStorage:", e);
+      }
     }
-  }, 90);
-}
-document.querySelectorAll("[data-t]").forEach(b => b.onclick = () => draw(b.dataset.t));
-function next(delta){
-  if(busy) return;
-  const p = S.players[S.idx];
-  p.score = Math.max(0, p.score + delta);
-  S.idx = (S.idx + 1) % S.players.length;
-  S.turns++; save(); buzz(15); goTurn();
-}
-$("#done").onclick = () => next(1);
-$("#pass").onclick = () => next(-1);
 
-/* ===================== PUNTOS ===================== */
-$("#toScores").onclick = () => {
-  const medals = ["🥇","🥈","🥉"];
-  const sorted = S.players.map((p,i) => ({...p, i})).sort((a,b) => b.score - a.score);
-  $("#slist").innerHTML = sorted.map((p,k) =>
-    `<div class="sc ${p.i === S.idx ? "cur" : ""}"><div class="pos">${medals[k] || (k+1)}</div>
-     <div class="nm">${esc(p.name)}</div><div class="pt">${p.score}</div></div>`).join("");
-  show("scores");
-};
-$("#back").onclick = goTurn;
-$("#reset").onclick = () => {
-  if(!confirm("¿Terminar la partida y volver al inicio?")) return;
-  S.started = false; save(); renderSetup(); show("setup");
-};
+    function saveGameState() {
+      try {
+        localStorage.setItem(STORAGE_KEY_GAME, JSON.stringify(state));
+      } catch (e) {
+        console.warn("No se pudo guardar la partida:", e);
+      }
+    }
 
-/* ===================== INICIO ===================== */
-renderSetup();
-if(S.started && S.players.length >= 2){ goTurn(); } else { show("setup"); }
+    function saveCustomBank() {
+      try {
+        localStorage.setItem(STORAGE_KEY_CUSTOM, JSON.stringify(customBank));
+      } catch (e) {
+        console.warn("No se pudo guardar banco personalizado:", e);
+      }
+    }
 
-if("serviceWorker" in navigator){
-  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
-}
-</script>
+    /* ==========================================================================
+       3. SINTETIZADOR DE SONIDO (WEB AUDIO API) Y VIBRACIÓN
+       ========================================================================== */
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) audioCtx = new AudioContext();
+      }
+      if (audioCtx && audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(freq, type = "sine", duration = 0.12, volume = 0.15) {
+      if (!state.soundEnabled) return;
+      try {
+        initAudio();
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function vibrate(pattern) {
+      if ("vibrate" in navigator) {
+        navigator.vibrate(pattern);
+      }
+    }
+
+    /* ==========================================================================
+       4. MOTOR DE DISTRIBUCIÓN ESPACIAL (CÍRCULO, CUADRADO, LÍNEA)
+       ========================================================================== */
+    function computePositions(count, shape) {
+      const positions = [];
+      if (count === 0) return positions;
+
+      if (shape === "circle") {
+        // Ángulos iguales empezando arriba (-90 deg)
+        const radius = count <= 8 ? 36 : count <= 16 ? 38 : 40;
+        for (let i = 0; i < count; i++) {
+          const angle = (2 * Math.PI * i) / count - Math.PI / 2;
+          const x = 50 + radius * Math.cos(angle);
+          const y = 50 + radius * Math.sin(angle);
+          positions.push({ x, y });
+        }
+      } else if (shape === "square") {
+        // Distribución uniforme alrededor del perímetro de un cuadrado (de 14% a 86%)
+        const min = 14;
+        const max = 86;
+        const side = max - min;
+        const perimeter = side * 4;
+
+        for (let i = 0; i < count; i++) {
+          const dist = (perimeter * i) / count;
+          let x = 50, y = 50;
+          if (dist < side) {
+            // Lado superior (izq -> der)
+            x = min + dist;
+            y = min;
+          } else if (dist < side * 2) {
+            // Lado derecho (arriba -> abajo)
+            x = max;
+            y = min + (dist - side);
+          } else if (dist < side * 3) {
+            // Lado inferior (der -> izq)
+            x = max - (dist - side * 2);
+            y = max;
+          } else {
+            // Lado izquierdo (abajo -> arriba)
+            x = min;
+            y = max - (dist - side * 3);
+          }
+          positions.push({ x, y });
+        }
+      } else if (shape === "line") {
+        // Fila única hasta 6 jugadores; múltiples filas equilibradas si hay más
+        const maxPerRow = 6;
+        const rows = Math.ceil(count / maxPerRow);
+        let idx = 0;
+
+        for (let r = 0; r < rows; r++) {
+          const remaining = count - idx;
+          const rowsLeft = rows - r;
+          const colsInThisRow = Math.ceil(remaining / rowsLeft);
+          const y = rows === 1 ? 50 : 18 + (64 * r) / (rows - 1);
+
+          for (let c = 0; c < colsInThisRow; c++) {
+            const x = colsInThisRow === 1 ? 50 : 12 + (76 * c) / (colsInThisRow - 1);
+            positions.push({ x, y });
+            idx++;
+          }
+        }
+      }
+
+      return positions;
+    }
+
+    function renderArena(containerId, guideId, highlightId = null, winnerId = null) {
+      const container = document.getElementById(containerId);
+      const guide = document.getElementById(guideId);
+
+      // Actualizar guía visual
+      guide.className = `arena-guide ${state.shape}`;
+
+      // Limpiar nodos previos manteniendo la guía y el banner central si existe
+      container.querySelectorAll(".player-node").forEach(n => n.remove());
+
+      const count = state.players.length;
+      if (count === 0) return;
+
+      const coords = computePositions(count, state.shape);
+
+      // Escalar tamaño del nodo según la cantidad de jugadores para evitar solapamientos
+      const nodeSize = count <= 6 ? 44 : count <= 12 ? 36 : count <= 18 ? 30 : 25;
+      const fontSize = count <= 6 ? 15 : count <= 12 ? 13 : count <= 18 ? 11 : 10;
+      const labelSize = count <= 10 ? 11 : count <= 18 ? 9.5 : 8.5;
+
+      state.players.forEach((player, i) => {
+        const pos = coords[i];
+        const node = document.createElement("div");
+        node.className = `player-node ${player.gender}`;
+        node.dataset.id = player.id;
+        node.style.left = `${pos.x}%`;
+        node.style.top = `${pos.y}%`;
+
+        if (player.id === highlightId) node.classList.add("roulette-highlight");
+        if (player.id === winnerId) node.classList.add("selected-winner");
+
+        const circle = document.createElement("div");
+        circle.className = "node-circle";
+        circle.style.width = `${nodeSize}px`;
+        circle.style.height = `${nodeSize}px`;
+        circle.style.fontSize = `${fontSize}px`;
+        circle.textContent = player.name.charAt(0).toUpperCase();
+
+        const label = document.createElement("div");
+        label.className = "node-name";
+        label.style.fontSize = `${labelSize}px`;
+        label.textContent = player.name;
+
+        node.appendChild(circle);
+        node.appendChild(label);
+        container.appendChild(node);
+      });
+    }
+
+    /* ==========================================================================
+       5. GESTIÓN DE JUGADORES Y CONFIGURACIÓN
+       ========================================================================== */
+    function showSetupAlert(msg) {
+      const el = document.getElementById("setupAlert");
+      if (!msg) {
+        el.classList.remove("visible");
+        el.textContent = "";
+        return;
+      }
+      el.textContent = msg;
+      el.classList.remove("visible");
+      void el.offsetWidth; // Reiniciar animación
+      el.classList.add("visible");
+      vibrate(40);
+    }
+
+    function renderPlayerList() {
+      const list = document.getElementById("playerList");
+      const counter = document.getElementById("playerCounter");
+      counter.textContent = `${state.players.length} / 25`;
+      list.innerHTML = "";
+
+      state.players.forEach((player, index) => {
+        const item = document.createElement("div");
+        item.className = `player-chip ${player.gender}`;
+
+        const info = document.createElement("div");
+        info.className = "player-chip-info";
+        info.innerHTML = `
+          <span class="player-seat">#${index + 1}</span>
+          <span>${player.gender === "F" ? "👩" : "👨"} ${escapeHtml(player.name)}</span>
+        `;
+
+        const actions = document.createElement("div");
+        actions.className = "chip-actions";
+
+        const editBtn = document.createElement("button");
+        editBtn.className = "mini-btn";
+        editBtn.textContent = "✏️";
+        editBtn.title = "Editar";
+        editBtn.onclick = () => startEditPlayer(player.id);
+
+        const delBtn = document.createElement("button");
+        delBtn.className = "mini-btn del";
+        delBtn.textContent = "🗑️";
+        delBtn.title = "Eliminar";
+        delBtn.onclick = () => deletePlayer(player.id);
+
+        actions.appendChild(editBtn);
+        actions.appendChild(delBtn);
+        item.appendChild(info);
+        item.appendChild(actions);
+        list.appendChild(item);
+      });
+
+      renderArena("setupArena", "setupGuide");
+      updateHeaderLeader();
+    }
+
+    function addOrUpdatePlayer() {
+      const input = document.getElementById("playerNameInput");
+      const name = input.value.trim();
+
+      if (!name) {
+        showSetupAlert("⚠️ Escribe un nombre antes de agregar.");
+        return;
+      }
+
+      if (editingPlayerId) {
+        const target = state.players.find(p => p.id === editingPlayerId);
+        if (target) {
+          target.name = name;
+          target.gender = selectedGender;
+        }
+        cancelEditPlayer();
+        showSetupAlert("");
+        saveGameState();
+        renderPlayerList();
+        playTone(520, "sine", 0.08);
+        return;
+      }
+
+      if (state.players.length >= 25) {
+        showSetupAlert("⚠️ Ya alcanzaste el máximo de 25 jugadores.");
+        return;
+      }
+
+      const duplicate = state.players.some(p => p.name.toLowerCase() === name.toLowerCase());
+      if (duplicate) {
+        showSetupAlert("⚠️ Ya existe un jugador con ese nombre. Añade una inicial.");
+        return;
+      }
+
+      state.players.push({
+        id: "p_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+        name,
+        gender: selectedGender,
+        score: 0
+      });
+
+      input.value = "";
+      input.focus();
+      showSetupAlert("");
+      saveGameState();
+      renderPlayerList();
+      playTone(600, "sine", 0.08);
+    }
+
+    function startEditPlayer(id) {
+      const player = state.players.find(p => p.id === id);
+      if (!player) return;
+      editingPlayerId = id;
+      document.getElementById("playerNameInput").value = player.name;
+      setGenderSelection(player.gender);
+      document.getElementById("formTitle").textContent = "✏️ Editando jugador";
+      document.getElementById("btnAddPlayer").textContent = "💾 Guardar cambios";
+      document.getElementById("btnCancelEdit").style.display = "inline-flex";
+      document.getElementById("playerNameInput").focus();
+    }
+
+    function cancelEditPlayer() {
+      editingPlayerId = null;
+      document.getElementById("playerNameInput").value = "";
+      document.getElementById("formTitle").textContent = "3. Agrega jugadores";
+      document.getElementById("btnAddPlayer").textContent = "➕ Agregar jugador";
+      document.getElementById("btnCancelEdit").style.display = "none";
+    }
+
+    function deletePlayer(id) {
+      if (editingPlayerId === id) cancelEditPlayer();
+      state.players = state.players.filter(p => p.id !== id);
+      saveGameState();
+      renderPlayerList();
+      playTone(300, "sine", 0.08);
+    }
+
+    function setGenderSelection(gender) {
+      selectedGender = gender;
+      document.getElementById("btnGenderF").classList.toggle("active", gender === "F");
+      document.getElementById("btnGenderM").classList.toggle("active", gender === "M");
+    }
+
+    /* ==========================================================================
+       6. MECÁNICA DE JUEGO: RULETA ALEATORIA, PREGUNTAS Y PUNTUACIÓN
+       ========================================================================== */
+    function switchScreen(screenName) {
+      state.screen = screenName;
+      document.getElementById("viewSetup").classList.toggle("active", screenName === "setup");
+      document.getElementById("viewGame").classList.toggle("active", screenName === "game");
+      saveGameState();
+    }
+
+    function startGame() {
+      if (state.players.length < 2) {
+        showSetupAlert("⚠️ Necesitas al menos 2 jugadores para iniciar.");
+        return;
+      }
+      if (state.players.length > 25) {
+        showSetupAlert("⚠️ El máximo permitido es de 25 jugadores.");
+        return;
+      }
+
+      showSetupAlert("");
+      state.round = 1;
+      state.playedInCycle = [];
+      state.currentPlayerId = null;
+      state.currentChoice = null;
+      switchScreen("game");
+      updateGameHeader();
+      pickNextRandomPlayer();
+    }
+
+    function updateGameHeader() {
+      const modeNames = { suave: "Suave 😇", divertido: "Divertido 🌶️", atrevido: "Atrevido 🔞" };
+      document.getElementById("roundNumber").textContent = state.round;
+      document.getElementById("activeModeLabel").textContent = modeNames[state.intensity];
+      const remaining = state.players.length - state.playedInCycle.length;
+      document.getElementById("remainingCycleCount").textContent = remaining;
+      updateHeaderLeader();
+    }
+
+    function pickNextRandomPlayer() {
+      if (isSpinning) return;
+      stopTimer();
+
+      // Ocultar tarjeta y botones mientras gira la ruleta
+      document.getElementById("flipContainer").classList.remove("active");
+      document.getElementById("flipCard").classList.remove("flipped");
+      document.getElementById("vrButtons").style.display = "none";
+      document.getElementById("centerBanner").classList.remove("visible");
+
+      // Filtrar jugadores que aún no han jugado en esta ronda
+      let candidates = state.players.filter(p => !state.playedInCycle.includes(p.id));
+      if (candidates.length === 0) {
+        state.playedInCycle = [];
+        state.round += 1;
+        candidates = [...state.players];
+      }
+
+      // Elegir ganador al azar entre candidatos disponibles
+      const winner = candidates[Math.floor(Math.random() * candidates.length)];
+
+      isSpinning = true;
+      document.getElementById("turnStatusSubtitle").textContent = "Eligiendo al azar...";
+      document.getElementById("currentPlayerName").textContent = "🎲 ...";
+      document.getElementById("currentPlayerName").className = "turn-player-title";
+
+      // Animación de ruleta recorriendo los nodos
+      const totalSteps = Math.max(12, state.players.length * 2) + Math.floor(Math.random() * state.players.length);
+      let step = 0;
+      let cursor = Math.floor(Math.random() * state.players.length);
+
+      function spinTick() {
+        const currentNodePlayer = state.players[cursor % state.players.length];
+        renderArena("gameArena", "gameGuide", currentNodePlayer.id, null);
+        playTone(320 + (step % 6) * 45, "triangle", 0.05, 0.1);
+
+        step++;
+        if (step < totalSteps) {
+          cursor++;
+          // Desaceleración progresiva al final
+          const progress = step / totalSteps;
+          const delay = 55 + Math.pow(progress, 2.4) * 190;
+          setTimeout(spinTick, delay);
+        } else {
+          // Detenerse exactamente en el ganador
+          finalizeTurnSelection(winner);
+        }
+      }
+
+      spinTick();
+    }
+
+    function finalizeTurnSelection(winner) {
+      isSpinning = false;
+      state.currentPlayerId = winner.id;
+      if (!state.playedInCycle.includes(winner.id)) {
+        state.playedInCycle.push(winner.id);
+      }
+
+      renderArena("gameArena", "gameGuide", null, winner.id);
+      updateGameHeader();
+      saveGameState();
+
+      // Cartel central con zoom/rebote
+      const banner = document.getElementById("centerBanner");
+      banner.className = `center-banner ${winner.gender} visible`;
+      document.getElementById("centerBannerName").textContent = winner.name;
+
+      // Panel inferior
+      document.getElementById("turnStatusSubtitle").textContent = "¡Es tu turno! Elige:";
+      const titleEl = document.getElementById("currentPlayerName");
+      titleEl.textContent = winner.name;
+      titleEl.className = `turn-player-title ${winner.gender}`;
+      document.getElementById("vrButtons").style.display = "grid";
+
+      // Efecto sonoro y vibración
+      playTone(587.33, "sine", 0.12, 0.18);
+      setTimeout(() => playTone(880, "sine", 0.22, 0.2), 110);
+      vibrate([60, 40, 90]);
+    }
+
+    function getPromptForChoice(type) {
+      const key = type === "verdad" ? "verdades" : "retos";
+      const mode = state.intensity;
+
+      // Combinar banco por defecto + banco personalizado del usuario
+      const fullPool = [
+        ...DEFAULT_BANK[mode][key],
+        ...(customBank[mode]?.[key] || [])
+      ];
+
+      let used = state.usedPrompts[mode][key] || [];
+      let available = fullPool.filter(item => !used.includes(item));
+
+      // Si se agotaron todas las preguntas de esa categoría, reiniciar ciclo
+      if (available.length === 0) {
+        state.usedPrompts[mode][key] = [];
+        available = [...fullPool];
+      }
+
+      const chosen = available[Math.floor(Math.random() * available.length)];
+      state.usedPrompts[mode][key].push(chosen);
+      return chosen;
+    }
+
+    function revealCard(choice) {
+      const player = state.players.find(p => p.id === state.currentPlayerId);
+      if (!player) return;
+
+      state.currentChoice = choice;
+      const promptText = getPromptForChoice(choice);
+      state.currentPrompt = promptText;
+      saveGameState();
+
+      renderCardUI(player, choice, promptText, true);
+    }
+
+    function renderCardUI(player, choice, promptText, animateFlip) {
+      document.getElementById("vrButtons").style.display = "none";
+      document.getElementById("centerBanner").classList.remove("visible");
+
+      const flipContainer = document.getElementById("flipContainer");
+      const flipCard = document.getElementById("flipCard");
+      const flipBack = document.getElementById("flipBack");
+      const typeLabel = document.getElementById("cardTypeLabel");
+      const playerBadge = document.getElementById("cardPlayerBadge");
+      const promptEl = document.getElementById("cardPromptText");
+      const timerBox = document.getElementById("timerBox");
+
+      flipBack.className = `flip-face flip-back type-${choice}`;
+      typeLabel.textContent = choice === "verdad" ? "🟢 VERDAD" : "🔥 RETO";
+      playerBadge.textContent = player.name;
+      playerBadge.style.color = player.gender === "F" ? "var(--female)" : "var(--male)";
+      promptEl.textContent = promptText;
+
+      // Mostrar temporizador solo en retos
+      stopTimer();
+      if (choice === "reto") {
+        timerBox.classList.add("visible");
+        document.getElementById("timerDisplay").textContent = "00:00";
+        document.getElementById("timerDisplay").classList.remove("urgent");
+      } else {
+        timerBox.classList.remove("visible");
+      }
+
+      flipContainer.classList.add("active");
+
+      if (animateFlip) {
+        flipCard.classList.remove("flipped");
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            flipCard.classList.add("flipped");
+            playTone(440, "sine", 0.1, 0.12);
+            setTimeout(() => playTone(660, "sine", 0.15, 0.14), 90);
+          });
+        });
+      } else {
+        flipCard.classList.add("flipped");
+      }
+    }
+
+    function resolveTurn(completed) {
+      const player = state.players.find(p => p.id === state.currentPlayerId);
+      if (player) {
+        player.score += completed ? 1 : -1;
+      }
+
+      if (completed) {
+        playTone(523.25, "sine", 0.1, 0.16);
+        setTimeout(() => playTone(783.99, "sine", 0.18, 0.18), 90);
+      } else {
+        playTone(260, "sawtooth", 0.18, 0.12);
+      }
+
+      state.currentChoice = null;
+      state.currentPrompt = "";
+      saveGameState();
+      updateHeaderLeader();
+      pickNextRandomPlayer();
+    }
+
+    /* ==========================================================================
+       7. TEMPORIZADOR PARA RETOS
+       ========================================================================== */
+    function startTimer(seconds) {
+      stopTimer();
+      timerSecondsLeft = seconds;
+      const display = document.getElementById("timerDisplay");
+      display.classList.remove("urgent");
+      updateTimerDisplay();
+
+      timerInterval = setInterval(() => {
+        timerSecondsLeft--;
+        updateTimerDisplay();
+
+        if (timerSecondsLeft <= 5 && timerSecondsLeft > 0) {
+          display.classList.add("urgent");
+          playTone(700, "sine", 0.06, 0.1);
+        }
+
+        if (timerSecondsLeft <= 0) {
+          stopTimer();
+          display.textContent = "¡TIEMPO!";
+          vibrate([200, 100, 200, 100, 300]);
+          playTone(880, "square", 0.25, 0.2);
+          setTimeout(() => playTone(660, "square", 0.35, 0.2), 260);
+        }
+      }, 1000);
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    function updateTimerDisplay() {
+      const mins = Math.floor(timerSecondsLeft / 60);
+      const secs = timerSecondsLeft % 60;
+      document.getElementById("timerDisplay").textContent =
+        `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    }
+
+    /* ==========================================================================
+       8. MARCADOR, PREGUNTAS PERSONALIZADAS Y REINICIO
+       ========================================================================== */
+    function updateHeaderLeader() {
+      if (state.players.length === 0) {
+        document.getElementById("headerLeader").textContent = "0";
+        return;
+      }
+      const maxScore = Math.max(...state.players.map(p => p.score));
+      document.getElementById("headerLeader").textContent = maxScore;
+    }
+
+    function openScoreboard() {
+      const list = document.getElementById("scoreboardList");
+      list.innerHTML = "";
+
+      if (state.players.length === 0) {
+        list.innerHTML = `<p class="subtitle" style="text-align:center;">Aún no hay jugadores registrados.</p>`;
+      } else {
+        const sorted = [...state.players].sort((a, b) => b.score - a.score);
+        sorted.forEach((p, idx) => {
+          const medal = idx === 0 && p.score > 0 ? "👑 " : "";
+          const row = document.createElement("div");
+          row.className = `score-row ${p.gender}`;
+          row.innerHTML = `
+            <span>${medal}${p.gender === "F" ? "👩" : "👨"} ${escapeHtml(p.name)}</span>
+            <span class="score-badge">${p.score} pts</span>
+          `;
+          list.appendChild(row);
+        });
+      }
+
+      document.getElementById("modalScores").classList.add("open");
+    }
+
+    function updateCustomCountInfo() {
+      let total = 0;
+      ["suave", "divertido", "atrevido"].forEach(m => {
+        total += (customBank[m]?.verdades?.length || 0) + (customBank[m]?.retos?.length || 0);
+      });
+      document.getElementById("customCountInfo").textContent =
+        `Tienes ${total} pregunta(s)/reto(s) personalizados guardados.`;
+    }
+
+    function saveNewCustomPrompt() {
+      const mode = document.getElementById("customIntensity").value;
+      const type = document.getElementById("customType").value;
+      const text = document.getElementById("customText").value.trim();
+      const alertEl = document.getElementById("customAlert");
+
+      if (text.length < 5) {
+        alertEl.textContent = "⚠️ Escribe una frase de al menos 5 caracteres.";
+        alertEl.classList.add("visible");
+        return;
+      }
+
+      alertEl.classList.remove("visible");
+      const key = type === "verdad" ? "verdades" : "retos";
+      customBank[mode][key].push(text);
+      saveCustomBank();
+
+      document.getElementById("customText").value = "";
+      updateCustomCountInfo();
+      playTone(650, "sine", 0.12);
+      document.getElementById("modalCustom").classList.remove("open");
+    }
+
+    function resetGameWithConfirm() {
+      const ok = confirm("¿Seguro que quieres reiniciar la partida? Se volverá a la configuración inicial y los puntos volverán a cero.");
+      if (!ok) return;
+
+      stopTimer();
+      state.players.forEach(p => (p.score = 0));
+      state.round = 1;
+      state.playedInCycle = [];
+      state.currentPlayerId = null;
+      state.currentChoice = null;
+      state.currentPrompt = "";
+      state.usedPrompts = {
+        suave: { verdades: [], retos: [] },
+        divertido: { verdades: [], retos: [] },
+        atrevido: { verdades: [], retos: [] }
+      };
+      switchScreen("setup");
+      renderPlayerList();
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, m => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[m]));
+    }
+
+    /* ==========================================================================
+       9. INICIALIZACIÓN Y EVENT LISTENERS
+       ========================================================================== */
+    function init() {
+      loadFromStorage();
+
+      // Sincronizar UI con estado cargado
+      document.getElementById("btnSoundToggle").textContent = state.soundEnabled ? "🔊" : "🔇";
+
+      document.querySelectorAll("#shapeSelector .choice-pill").forEach(pill => {
+        pill.classList.toggle("selected", pill.dataset.shape === state.shape);
+        pill.addEventListener("click", () => {
+          state.shape = pill.dataset.shape;
+          document.querySelectorAll("#shapeSelector .choice-pill").forEach(p => p.classList.remove("selected"));
+          pill.classList.add("selected");
+          saveGameState();
+          renderArena("setupArena", "setupGuide");
+          playTone(480, "sine", 0.06);
+        });
+      });
+
+      document.querySelectorAll("#intensitySelector .choice-pill").forEach(pill => {
+        pill.classList.toggle("selected", pill.dataset.intensity === state.intensity);
+        pill.addEventListener("click", () => {
+          const chosen = pill.dataset.intensity;
+          if (chosen === "atrevido" && state.intensity !== "atrevido") {
+            document.getElementById("modalAdultWarning").classList.add("open");
+            return;
+          }
+          applyIntensity(chosen);
+        });
+      });
+
+      document.getElementById("btnConfirmAdult").addEventListener("click", () => {
+        document.getElementById("modalAdultWarning").classList.remove("open");
+        applyIntensity("atrevido");
+      });
+
+      document.getElementById("btnCancelAdult").addEventListener("click", () => {
+        document.getElementById("modalAdultWarning").classList.remove("open");
+      });
+
+      function applyIntensity(mode) {
+        state.intensity = mode;
+        document.querySelectorAll("#intensitySelector .choice-pill").forEach(p => {
+          p.classList.toggle("selected", p.dataset.intensity === mode);
+        });
+        saveGameState();
+        playTone(520, "sine", 0.07);
+      }
+
+      // Botones de sexo
+      document.getElementById("btnGenderF").addEventListener("click", () => setGenderSelection("F"));
+      document.getElementById("btnGenderM").addEventListener("click", () => setGenderSelection("M"));
+
+      // Agregar / editar jugador
+      document.getElementById("btnAddPlayer").addEventListener("click", addOrUpdatePlayer);
+      document.getElementById("btnCancelEdit").addEventListener("click", cancelEditPlayer);
+      document.getElementById("playerNameInput").addEventListener("keydown", e => {
+        if (e.key === "Enter") addOrUpdatePlayer();
+      });
+
+      // Iniciar juego
+      document.getElementById("btnStartGame").addEventListener("click", startGame);
+
+      // Decisiones de juego
+      document.getElementById("btnChooseTruth").addEventListener("click", () => revealCard("verdad"));
+      document.getElementById("btnChooseDare").addEventListener("click", () => revealCard("reto"));
+      document.getElementById("btnComplete").addEventListener("click", () => resolveTurn(true));
+      document.getElementById("btnPass").addEventListener("click", () => resolveTurn(false));
+
+      // Presets de temporizador
+      document.querySelectorAll(".timer-preset-btn").forEach(btn => {
+        btn.addEventListener("click", () => startTimer(Number(btn.dataset.sec)));
+      });
+
+      // Header acciones y modales
+      document.getElementById("btnSoundToggle").addEventListener("click", () => {
+        state.soundEnabled = !state.soundEnabled;
+        document.getElementById("btnSoundToggle").textContent = state.soundEnabled ? "🔊" : "🔇";
+        saveGameState();
+      });
+
+      document.getElementById("btnOpenScores").addEventListener("click", openScoreboard);
+      document.getElementById("btnOpenCustom").addEventListener("click", () => {
+        updateCustomCountInfo();
+        document.getElementById("modalCustom").classList.add("open");
+      });
+      document.getElementById("btnSaveCustom").addEventListener("click", saveNewCustomPrompt);
+      document.getElementById("btnResetGame").addEventListener("click", resetGameWithConfirm);
+
+      document.querySelectorAll("[data-close]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.getElementById(btn.dataset.close).classList.remove("open");
+        });
+      });
+
+      // Restaurar partida si ya estaba en curso
+      renderPlayerList();
+      if (state.screen === "game" && state.players.length >= 2) {
+        switchScreen("game");
+        updateGameHeader();
+        const activePlayer = state.players.find(p => p.id === state.currentPlayerId);
+
+        if (activePlayer) {
+          renderArena("gameArena", "gameGuide", null, activePlayer.id);
+          const titleEl = document.getElementById("currentPlayerName");
+          titleEl.textContent = activePlayer.name;
+          titleEl.className = `turn-player-title ${activePlayer.gender}`;
+
+          if (state.currentChoice && state.currentPrompt) {
+            document.getElementById("turnStatusSubtitle").textContent = "¡Cumple o pasa!";
+            renderCardUI(activePlayer, state.currentChoice, state.currentPrompt, false);
+          } else {
+            document.getElementById("turnStatusSubtitle").textContent = "¡Es tu turno! Elige:";
+            document.getElementById("vrButtons").style.display = "grid";
+          }
+        } else {
+          pickNextRandomPlayer();
+        }
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
 </body>
 </html>
